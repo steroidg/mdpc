@@ -6,8 +6,8 @@ using namespace std;
 
 int main( int argc, char *argv[] )
 {
-	const int SCREEN_WIDTH	= 1024;
-	const int SCREEN_HEIGHT = 480;
+	const int SCREEN_WIDTH	= 600;
+	const int SCREEN_HEIGHT = 600;
 	const int SCREEN_BPP = 32;
 	
 	bool quit = false;
@@ -20,6 +20,13 @@ int main( int argc, char *argv[] )
 	while ( quit == false ) {
 		Uint32 bg_colour = SDL_MapRGB(screen->format, 0, 255, 255);
 		if ( SDL_FillRect(screen, &screen->clip_rect, bg_colour) == -1 ) {
+				printf ("%s %d ERROR: failed to fill background colour.\n", __PRETTY_FUNCTION__, __LINE__);
+				return 1;
+		} 
+		
+		Uint32 block_colour = SDL_MapRGB(screen->format, 255, 0, 255);
+		SDL_Rect block_location = { 0, 0, 60, 60 };
+		if ( SDL_FillRect(screen, &block_location , block_colour) == -1 ) {
 				printf ("%s %d ERROR: failed to fill background colour.\n", __PRETTY_FUNCTION__, __LINE__);
 				return 1;
 		} 
