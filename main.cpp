@@ -18,6 +18,17 @@ int main( int argc, char *argv[] )
     screen = SDL_SetVideoMode( SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, SDL_HWSURFACE );
 
 	while ( quit == false ) {
+		Uint32 bg_colour = SDL_MapRGB(screen->format, 0, 255, 255);
+		if ( SDL_FillRect(screen, &screen->clip_rect, bg_colour) == -1 ) {
+				printf ("%s %d ERROR: failed to fill background colour.\n", __PRETTY_FUNCTION__, __LINE__);
+				return 1;
+		} 
+		
+		if ( SDL_Flip(screen) == -1 ) {
+				printf ("%s %d ERROR: failed to flip.\n", __PRETTY_FUNCTION__, __LINE__);
+				return 1;
+		}
+		
 		while( SDL_PollEvent( &event ) ) {
 			if( event.type == SDL_QUIT ) {
 				printf ("%s %d Quit event decected.\n", __PRETTY_FUNCTION__, __LINE__);
