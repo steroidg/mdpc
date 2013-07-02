@@ -1,6 +1,7 @@
 #include <SDL.h>
 #include <iostream>
 #include "player_character.hpp"
+#include "grid_unit.hpp"
 
 
 using namespace std;
@@ -24,10 +25,9 @@ int main( int argc, char *argv[] )
 		return 1;
 	}
 	
-	PlayerCharacter pl( 70, 70 ); 
-	int poo = pl.get_h();
-	printf ("%s %d h= %d\n", __PRETTY_FUNCTION__, __LINE__, poo);
-
+	
+	GridUnit *gu = new GridUnit(60, 0, 60, 60);
+	
 	while ( quit == false ) {
 		Uint32 bg_colour = SDL_MapRGB(screen->format, 0, 255, 255);
 		if ( SDL_FillRect(screen, &screen->clip_rect, bg_colour) == -1 ) {
@@ -43,6 +43,14 @@ int main( int argc, char *argv[] )
 		} 
 		SDL_BlitSurface( player, NULL, screen, &block_location );
 		
+		SDL_Rect gu_location = { gu->get_x(), gu->get_y(), gu->get_w(), gu->get_h()};
+		SDL_Surface * gu_surface = gu->get_surface();
+		if (gu_surface == NULL) {
+				printf ("%s %d ERROR: failed to get gu_surface .\n", __PRETTY_FUNCTION__, __LINE__);
+				return 1;
+		}
+		SDL_BlitSurface( gu_surface, NULL, screen, &gu_location );
+		
 		if ( SDL_Flip(screen) == -1 ) {
 				printf ("%s %d ERROR: failed to flip.\n", __PRETTY_FUNCTION__, __LINE__);
 				return 1;
@@ -55,7 +63,8 @@ int main( int argc, char *argv[] )
 			}
 		}
 	}
-    
+	
+	delete gu;
 	SDL_FreeSurface ( screen );
 	SDL_FreeSurface ( player );
 	SDL_Quit();
