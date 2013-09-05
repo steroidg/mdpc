@@ -17,6 +17,7 @@ int main( int argc, char *argv[] )
 	SDL_Surface *screen = NULL;
 	SDL_Surface *player = NULL;
 	
+	
 	/* init */
 	SDL_Init( SDL_INIT_EVERYTHING );
 	screen = SDL_SetVideoMode( SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, SDL_HWSURFACE );
