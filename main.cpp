@@ -8,26 +8,30 @@ using namespace std;
 
 int main( int argc, char *argv[] )
 {
+	/* init variables */
 	const int SCREEN_WIDTH	= 600;
 	const int SCREEN_HEIGHT = 600;
 	const int SCREEN_BPP = 32;
-	
 	bool quit = false;
 	SDL_Event event;
 	SDL_Surface *screen = NULL;
 	SDL_Surface *player = NULL;
 	
-    SDL_Init( SDL_INIT_EVERYTHING );
+	/* init */
+	SDL_Init( SDL_INIT_EVERYTHING );
 	screen = SDL_SetVideoMode( SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, SDL_HWSURFACE );
+	
+	/* this is temporary for testing, to be replaced by player_character class */
 	player = SDL_CreateRGBSurface(0, 60, 60, 32, 0, 0, 0, 0);
 	if ( player == NULL) {
 		printf ("%s %d ERROR: failed to create player surface.\n", __PRETTY_FUNCTION__, __LINE__);
 		return 1;
 	}
 	
-	
+	/* This is temporary, as we need more than 1 of these */
 	GridUnit *gu = new GridUnit(60, 0, 60, 60);
 	
+	/* game loop */
 	while ( quit == false ) {
 		Uint32 bg_colour = SDL_MapRGB(screen->format, 0, 255, 255);
 		if ( SDL_FillRect(screen, &screen->clip_rect, bg_colour) == -1 ) {
@@ -64,6 +68,7 @@ int main( int argc, char *argv[] )
 		}
 	}
 	
+	/* clean up */
 	delete gu;
 	SDL_FreeSurface ( screen );
 	SDL_FreeSurface ( player );
