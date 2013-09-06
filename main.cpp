@@ -12,6 +12,7 @@ int main( int argc, char *argv[] )
 	const int SCREEN_WIDTH	= 600;
 	const int SCREEN_HEIGHT = 600;
 	const int SCREEN_BPP = 32;
+	const int GRID_SIZE = 60;
 	bool quit = false;
 	SDL_Event event;
 	SDL_Surface *screen = NULL;
@@ -28,9 +29,15 @@ int main( int argc, char *argv[] )
 		return 1;
 	}
 	
-	/* This is temporary, as we need more than 1 of these */
-	GridUnit *gu = new GridUnit(60, 0, 60, 60);
+	int grid_x = SCREEN_WIDTH/GRID_SIZE;
+	int grid_y = SCREEN_HEIGHT/GRID_SIZE;
+	int grid_total = grid_x * grid_y;
+	printf ("grid_x = %d, grid_y = %d, grid_total = %d.\n", grid_x, grid_y, grid_total);
 	
+	/* This is temporary, as we need more than 1 of these */
+	GridUnit *gu_array[3] = {new GridUnit (60, 0, 60, 60), new GridUnit (120, 0, 120, 120), new GridUnit (180, 0, 180, 180)};
+	
+		printf ("boo\n");
 	/* game loop */
 	while ( quit == false ) {
 		Uint32 bg_colour = SDL_MapRGB(screen->format, 0, 255, 255);
@@ -47,14 +54,16 @@ int main( int argc, char *argv[] )
 		} 
 		SDL_BlitSurface( player, NULL, screen, &block_location );
 		
-		SDL_Rect gu_location = { gu->get_x(), gu->get_y(), gu->get_w(), gu->get_h()};
-		SDL_Surface * gu_surface = gu->get_surface();
-		if (gu_surface == NULL) {
-				printf ("%s %d ERROR: failed to get gu_surface .\n", __PRETTY_FUNCTION__, __LINE__);
-				return 1;
+		for (int i = 0; i < 3; i++) {
+			printf ("i = %d \n", i);
+			SDL_Rect gu_location = { gu_array[i]->get_x(), gu_array[i]->get_y(), gu_array[i]->get_w(), gu_array[i]->get_h()};
+			SDL_Surface * gu_surface = gu_array[i]->get_surface();
+			if (gu_surface == NULL) {
+					printf ("%s %d ERROR: failed to get gu_surface .\n", __PRETTY_FUNCTION__, __LINE__);
+					return 1;
+			}
+			SDL_BlitSurface( gu_surface, NULL, screen, &gu_location );
 		}
-		SDL_BlitSurface( gu_surface, NULL, screen, &gu_location );
-		
 		if ( SDL_Flip(screen) == -1 ) {
 				printf ("%s %d ERROR: failed to flip.\n", __PRETTY_FUNCTION__, __LINE__);
 				return 1;
@@ -69,7 +78,9 @@ int main( int argc, char *argv[] )
 	}
 	
 	/* clean up */
-	delete gu;
+	for (int i = 0; i < 3; i++) {
+	  delete gu_array[i];
+	}
 	SDL_FreeSurface ( screen );
 	SDL_FreeSurface ( player );
 	SDL_Quit();
