@@ -2,6 +2,7 @@
 
 GridUnit::GridUnit(int x, int y, int w, int h)
 {
+	printf ("%s %d\n", __PRETTY_FUNCTION__, __LINE__);
 	surface = NULL;
 	this->x = x;
 	this->y = y;

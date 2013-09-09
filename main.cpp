@@ -8,6 +8,7 @@ using namespace std;
 
 int main( int argc, char *argv[] )
 {
+		printf ("boo\n");
 	/* init variables */
 	const int SCREEN_WIDTH	= 600;
 	const int SCREEN_HEIGHT = 600;
@@ -35,9 +36,12 @@ int main( int argc, char *argv[] )
 	printf ("grid_x = %d, grid_y = %d, grid_total = %d.\n", grid_x, grid_y, grid_total);
 	
 	/* This is temporary, as we need more than 1 of these */
-	GridUnit *gu_array[3] = {new GridUnit (60, 0, 60, 60), new GridUnit (120, 0, 120, 120), new GridUnit (180, 0, 180, 180)};
+	//GridUnit *gu_array[3] = {new GridUnit (60, 0, 60, 60), new GridUnit (120, 0, 120, 120), new GridUnit (180, 0, 180, 180)};
+	GridUnit ** gu_array = new GridUnit*[3];
+	for (int i = 0; i < 3; i++) {
+	  gu_array[i] = new GridUnit();
+	}
 	
-		printf ("boo\n");
 	/* game loop */
 	while ( quit == false ) {
 		Uint32 bg_colour = SDL_MapRGB(screen->format, 0, 255, 255);

@@ -3,7 +3,7 @@
 
 class GridUnit {
 	public:
-		GridUnit(int x, int y, int w, int h);
+		GridUnit(int x=0, int y=0, int w=60, int h=60);
 		~GridUnit();
 		SDL_Surface * get_surface();
 		int get_x();
