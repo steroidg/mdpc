@@ -3,16 +3,21 @@
 
 class PlayerCharacter {
 	public:
-		PlayerCharacter(int w, int h);
+		PlayerCharacter(int x, int y, int w, int h);
 		~PlayerCharacter();
+		SDL_Surface * get_surface();
 		int get_x();
 		int get_y();
 		int get_w();
 		int get_h();
 	private:
-//		SDL_Surface *pc_surface;
-		int pc_x;
-		int pc_y;
-		int pc_w;
-		int pc_h;
+		SDL_Surface *surface;
+		int x;
+		int y;
+		int w;
+		int h;
+		void set_x(int x);
+		void set_y(int y);
+		void set_w(int w);
+		void set_h(int h);
 };

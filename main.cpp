@@ -16,18 +16,10 @@ int main( int argc, char *argv[] )
 	bool quit = false;
 	SDL_Event event;
 	SDL_Surface *screen = NULL;
-	SDL_Surface *player = NULL;
 	
 	/* init */
 	SDL_Init( SDL_INIT_EVERYTHING );
 	screen = SDL_SetVideoMode( SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, SDL_HWSURFACE );
-	
-	/* this is temporary for testing, to be replaced by player_character class */
-	player = SDL_CreateRGBSurface(0, 60, 60, 32, 0, 0, 0, 0);
-	if ( player == NULL) {
-		printf ("%s %d ERROR: failed to create player surface.\n", __PRETTY_FUNCTION__, __LINE__);
-		return 1;
-	}
 	
 	int grid_x = SCREEN_WIDTH/GRID_SIZE;
 	int grid_y = SCREEN_HEIGHT/GRID_SIZE;
@@ -48,6 +40,9 @@ int main( int argc, char *argv[] )
 		printf ("i=%d, x=%d, y=%d\n", i, x, y);
 	}
 	
+	PlayerCharacter * pc = new PlayerCharacter (0, 0, 50, 50);
+	SDL_Surface *pc_surface = pc->get_surface();
+	
 	
 	/* game loop */
 	while ( quit == false ) {
@@ -56,15 +51,6 @@ int main( int argc, char *argv[] )
 			printf ("%s %d ERROR: failed to fill background colour.\n", __PRETTY_FUNCTION__, __LINE__);
 			return 1;
 		} 
-		
-		Uint32 block_colour = SDL_MapRGB(player->format, 0, 0, 255);
-		SDL_Rect block_location = { 0, 60, 60, 60 };
-		if ( SDL_FillRect(player, &player->clip_rect , block_colour) == -1 ) {
-			printf ("%s %d ERROR: failed to fill player colour.\n", __PRETTY_FUNCTION__, __LINE__);
-			return 1;
-		} 
-		SDL_BlitSurface( player, NULL, screen, &block_location );
-		
 		
 		for (int i = 0; i < grid_total; i++) {
 			SDL_Rect gu_location = { gu_array[i]->get_x(), gu_array[i]->get_y(), gu_array[i]->get_w(), gu_array[i]->get_h()};
@@ -76,6 +62,10 @@ int main( int argc, char *argv[] )
 			}
 			SDL_BlitSurface( gu_surface, NULL, screen, &gu_location );
 		}
+		
+		SDL_Rect pc_location = { pc->get_x(), pc->get_y(), pc->get_w(), pc->get_h() };
+		SDL_BlitSurface( pc_surface, NULL, screen, &pc_location );
+		
 		if ( SDL_Flip(screen) == -1 ) {
 			printf ("%s %d ERROR: failed to flip.\n", __PRETTY_FUNCTION__, __LINE__);
 			return 1;
@@ -94,8 +84,8 @@ int main( int argc, char *argv[] )
 	  delete gu_array[i];
 	}
 	delete gu_array;
+	delete pc;
 	SDL_FreeSurface ( screen );
-	SDL_FreeSurface ( player );
 	SDL_Quit();
     
 	return 0;
