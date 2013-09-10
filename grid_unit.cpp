@@ -2,7 +2,6 @@
 
 GridUnit::GridUnit(int x, int y, int w, int h)
 {
-	printf ("%s %d\n", __PRETTY_FUNCTION__, __LINE__);
 	surface = NULL;
 	this->x = x;
 	this->y = y;
@@ -18,13 +17,12 @@ GridUnit::GridUnit(int x, int y, int w, int h)
 	if ( SDL_FillRect(surface, &surface->clip_rect , colour) == -1 ) {
 		printf ("%s %d ERROR: failed to fill grid colour.\n", __PRETTY_FUNCTION__, __LINE__);
 	}
-	printf ("%s %d %d %d %d %d wee!.\n", __PRETTY_FUNCTION__, __LINE__, x, y, h, w);
 }
 
 GridUnit::~GridUnit()
 {
 	SDL_FreeSurface ( surface );
-	printf ("%s %d deleted.\n", __PRETTY_FUNCTION__, __LINE__);
+//	printf ("%s %d deleted.\n", __PRETTY_FUNCTION__, __LINE__);
 }
 
 SDL_Surface * GridUnit::get_surface() {
@@ -45,4 +43,20 @@ int GridUnit::get_w() {
 
 int GridUnit::get_h() {
 	return h;
+}
+
+void GridUnit::set_x(int x) {
+	this->x = x;
+}
+
+void GridUnit::set_y(int y) {
+	this->y = y;
+}
+
+void GridUnit::set_w(int w) {
+	this->w = w;
+}
+
+void GridUnit::set_h(int h) {
+	this->h = h;
 }
