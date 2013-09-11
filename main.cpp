@@ -12,7 +12,8 @@ int main( int argc, char *argv[] )
 	const int SCREEN_WIDTH	= 600;
 	const int SCREEN_HEIGHT = 600;
 	const int SCREEN_BPP = 32;
-	const int GRID_SIZE = 60;
+	const int GRID_SIZE_W = 60;
+	const int GRID_SIZE_H = 50;
 	bool quit = false;
 	SDL_Event event;
 	SDL_Surface *screen = NULL;
@@ -21,8 +22,8 @@ int main( int argc, char *argv[] )
 	SDL_Init( SDL_INIT_EVERYTHING );
 	screen = SDL_SetVideoMode( SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, SDL_HWSURFACE );
 	
-	int grid_x = SCREEN_WIDTH/GRID_SIZE;
-	int grid_y = SCREEN_HEIGHT/GRID_SIZE;
+	int grid_x = SCREEN_WIDTH/GRID_SIZE_W;
+	int grid_y = SCREEN_HEIGHT/GRID_SIZE_H;
 	int grid_total = grid_x * grid_y;
 	printf ("grid_x = %d, grid_y = %d, grid_total = %d.\n", grid_x, grid_y, grid_total);
 	
@@ -30,7 +31,7 @@ int main( int argc, char *argv[] )
 	int x = 0; 
 	int y = 0; 
 	for (int i = 0; i < grid_total; i++) {
-		gu_array[i] = new GridUnit(x*GRID_SIZE, y*GRID_SIZE, GRID_SIZE, GRID_SIZE);
+		gu_array[i] = new GridUnit(x*GRID_SIZE_W, y*GRID_SIZE_H, GRID_SIZE_W, GRID_SIZE_H);
 		y++;
 		if (y == grid_y) {
 			printf ("wtf\n");
@@ -40,7 +41,7 @@ int main( int argc, char *argv[] )
 		printf ("i=%d, x=%d, y=%d\n", i, x, y);
 	}
 	
-	PlayerCharacter * pc = new PlayerCharacter (0, 0, 50, 50);
+	PlayerCharacter * pc = new PlayerCharacter (0, 0, GRID_SIZE_W, GRID_SIZE_H);
 	SDL_Surface *pc_surface = pc->get_surface();
 	
 	
