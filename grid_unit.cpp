@@ -9,14 +9,11 @@ GridUnit::GridUnit(int x, int y, int w, int h)
 	this->h = y;
 	
 	surface = SDL_CreateRGBSurface(0, w, h, 32, 0, 0, 0, 0);
-	
 	if (surface == NULL) {
 		printf ("%s %d ERROR: failed create surface.\n", __PRETTY_FUNCTION__, __LINE__);
 	}
-	Uint32 colour = SDL_MapRGB(surface->format, 0, 255, 0);
-	if ( SDL_FillRect(surface, &surface->clip_rect , colour) == -1 ) {
-		printf ("%s %d ERROR: failed to fill grid colour.\n", __PRETTY_FUNCTION__, __LINE__);
-	}
+	
+	this->render(0,0,0);
 }
 
 GridUnit::~GridUnit()
@@ -24,6 +21,19 @@ GridUnit::~GridUnit()
 	SDL_FreeSurface ( surface );
 //	printf ("%s %d deleted.\n", __PRETTY_FUNCTION__, __LINE__);
 }
+
+void GridUnit::render(int r, int g, int b) {
+	Uint32 colour = SDL_MapRGB(surface->format, r, g, b);
+	if ( SDL_FillRect(surface, &surface->clip_rect , colour) == -1 ) {
+		printf ("%s %d ERROR: failed to fill grid colour.\n", __PRETTY_FUNCTION__, __LINE__);
+	}
+}
+
+void GridUnit::set_colour(int r, int g, int b)
+{
+	this->render (r, g, b);
+}
+
 
 SDL_Surface * GridUnit::get_surface() {
 	return surface;

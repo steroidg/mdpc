@@ -6,6 +6,26 @@
 
 using namespace std;
 
+int player_location (int x, int y, int w, int h, GridUnit ** gu_array, int grid_total) {
+	int player_location = 0;
+	int pc_centre_x = x + (w/2);
+	int pc_centre_y = y + (h/2);
+	
+	for (int i = 0; i < grid_total; i++) {
+		player_location = i;
+		printf ("pc_centre_x = %d, gu_array[i]->get_x() = %d, gu_array[i]->get_w() = %d\n", pc_centre_x, gu_array[i]->get_x(), gu_array[i]->get_w());
+		printf ("pc_centre_y = %d, gu_array[i]->get_y() = %d, gu_array[i]->get_h() = %d\n", pc_centre_y, gu_array[i]->get_y(), gu_array[i]->get_h());
+		if (pc_centre_x >= gu_array[i]->get_x() &&
+		    pc_centre_x < (gu_array[i]->get_x() + gu_array[i]->get_w()) &&
+		    pc_centre_y >= gu_array[i]->get_y() &&
+		    pc_centre_y < (gu_array[i]->get_y() + gu_array[i]->get_h())) {
+			printf ("i = %d\n", i);
+			break;
+		}
+	}
+	return player_location;
+}
+
 int main( int argc, char *argv[] )
 {
 	/* init variables */
@@ -41,8 +61,10 @@ int main( int argc, char *argv[] )
 		printf ("i=%d, x=%d, y=%d\n", i, x, y);
 	}
 	
-	PlayerCharacter * pc = new PlayerCharacter (0, 0, GRID_SIZE_W, GRID_SIZE_H);
+	PlayerCharacter * pc = new PlayerCharacter (170, 190, GRID_SIZE_W, GRID_SIZE_H);
 	SDL_Surface *pc_surface = pc->get_surface();
+	int pc_grid = player_location(pc->get_x(), pc->get_y(), pc->get_w(), pc->get_h(), gu_array, grid_total);
+	gu_array[pc_grid]->set_colour(255,255,255);
 	
 	
 	/* game loop */

@@ -14,10 +14,12 @@ class GridUnit {
 		void set_y(int y);
 		void set_w(int w);
 		void set_h(int h);
+		void set_colour (int r, int g, int b);
 	private:
 		SDL_Surface *surface;
 		int x;
 		int y;
 		int w;
 		int h;
+		void render(int r, int g, int b);
 };
