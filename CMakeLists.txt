@@ -10,6 +10,8 @@ set(VERSION_PATCH 1)
 
 # find the libraries we want
 find_package(SDL REQUIRED)
+find_package(SDL_image REQUIRED)
+find_package(SDL_ttf REQUIRED)
 
 # use the constants defined for packages to setup compiler options
 include_directories(${SDL_INCLUDE_DIR})
@@ -25,7 +27,7 @@ add_executable( mdpc
     )
 
 # link against the sdl libraries
-target_link_libraries( mdpc ${SDL_LIBRARY})
+target_link_libraries( mdpc ${SDL_LIBRARY} ${SDLIMAGE_LIBRARY} ${SDLTTF_LIBRARY})
 
 
 # set any compiler options

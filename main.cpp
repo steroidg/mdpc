@@ -1,4 +1,5 @@
 #include <SDL.h>
+#include <SDL_ttf.h>
 #include <iostream>
 #include "player_character.hpp"
 #include "grid_unit.hpp"
@@ -38,6 +39,17 @@ int main( int argc, char *argv[] )
 	SDL_Event event;
 	SDL_Surface *screen = NULL;
 	
+	TTF_Init();
+	SDL_Surface * on_screen_display = NULL;
+	TTF_Font *font = NULL;
+	SDL_Color textColor = { 0, 255, 0 };
+	font = TTF_OpenFont( "/home/billy/Dropbox/devel/mdpc/Ubuntu-B.ttf", 36 );
+	printf ("TTF ERROR: %s\n", TTF_GetError());
+	if (font == NULL) {
+		printf ("wtf font!.\n");
+		return 1;
+	}
+	
 	/* init */
 	SDL_Init( SDL_INIT_EVERYTHING );
 	screen = SDL_SetVideoMode( SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, SDL_HWSURFACE );
@@ -61,7 +73,7 @@ int main( int argc, char *argv[] )
 		printf ("i=%d, x=%d, y=%d\n", i, x, y);
 	}
 	
-	PlayerCharacter * pc = new PlayerCharacter (170, 190, GRID_SIZE_W, GRID_SIZE_H);
+	PlayerCharacter * pc = new PlayerCharacter (220, 240, GRID_SIZE_W, GRID_SIZE_H);
 	SDL_Surface *pc_surface = pc->get_surface();
 	int pc_grid = player_location(pc->get_x(), pc->get_y(), pc->get_w(), pc->get_h(), gu_array, grid_total);
 	gu_array[pc_grid]->set_colour(255,255,255);
@@ -69,6 +81,10 @@ int main( int argc, char *argv[] )
 	
 	/* game loop */
 	while ( quit == false ) {
+		on_screen_display = TTF_RenderText_Solid( font, "test", textColor );
+		SDL_Rect osd_location = {50, 50, 300, 100};
+		
+		
 		Uint32 bg_colour = SDL_MapRGB(screen->format, 0, 255, 255);
 		if ( SDL_FillRect(screen, &screen->clip_rect, bg_colour) == -1 ) {
 			printf ("%s %d ERROR: failed to fill background colour.\n", __PRETTY_FUNCTION__, __LINE__);
@@ -88,6 +104,7 @@ int main( int argc, char *argv[] )
 		
 		SDL_Rect pc_location = { pc->get_x(), pc->get_y(), pc->get_w(), pc->get_h() };
 		SDL_BlitSurface( pc_surface, NULL, screen, &pc_location );
+		SDL_BlitSurface( on_screen_display, NULL, screen, &osd_location );
 		
 		if ( SDL_Flip(screen) == -1 ) {
 			printf ("%s %d ERROR: failed to flip.\n", __PRETTY_FUNCTION__, __LINE__);
@@ -108,6 +125,7 @@ int main( int argc, char *argv[] )
 	}
 	delete gu_array;
 	delete pc;
+	TTF_CloseFont( font );
 	SDL_FreeSurface ( screen );
 	SDL_Quit();
     

@@ -6,14 +6,14 @@ GridUnit::GridUnit(int x, int y, int w, int h)
 	this->x = x;
 	this->y = y;
 	this->w = w;
-	this->h = y;
+	this->h = h;
 	
 	surface = SDL_CreateRGBSurface(0, w, h, 32, 0, 0, 0, 0);
 	if (surface == NULL) {
 		printf ("%s %d ERROR: failed create surface.\n", __PRETTY_FUNCTION__, __LINE__);
 	}
 	
-	this->render(0,0,0);
+	this->render(0,0,100);
 }
 
 GridUnit::~GridUnit()
