@@ -10,14 +10,14 @@ class PlayerCharacter {
 		int get_y();
 		int get_w();
 		int get_h();
+                void set_x(int x);
+                void set_y(int y);
+                void set_w(int w);
+                void set_h(int h);
 	private:
 		SDL_Surface *surface;
 		int x;
 		int y;
 		int w;
 		int h;
-		void set_x(int x);
-		void set_y(int y);
-		void set_w(int w);
-		void set_h(int h);
 };
