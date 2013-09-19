@@ -8,7 +8,8 @@
 
 using namespace std;
 
-int player_location ( int x, int y, int w, int h, GridUnit ** gu_array, int grid_total ) {
+int player_location ( int x, int y, int w, int h, GridUnit ** gu_array, int grid_total )
+{
     int player_location = 0;
     int pc_centre_x = x + ( w/2 );
     int pc_centre_y = y + ( h/2 );
@@ -16,23 +17,25 @@ int player_location ( int x, int y, int w, int h, GridUnit ** gu_array, int grid
     for ( int i = 0; i < grid_total; i++ ) {
         player_location = i;
         printf ( "pc_centre_x = %d, gu_array[i]->get_x() = %d, gu_array[i]->get_w() = %d\n",
-		 pc_centre_x,
-		 gu_array[i]->get_x(),
-		 gu_array[i]->get_w()
-	       );
-        printf ( "pc_centre_y = %d, gu_array[i]->get_y() = %d, gu_array[i]->get_h() = %d\n", pc_centre_y, gu_array[i]->get_y(), gu_array[i]->get_h() );
+                 pc_centre_x,
+                 gu_array[i]->get_x(),
+                 gu_array[i]->get_w()
+               );
+        printf ( "pc_centre_y = %d, gu_array[i]->get_y() = %d, gu_array[i]->get_h() = %d\n", pc_centre_y,
+                 gu_array[i]->get_y(), gu_array[i]->get_h() );
         if ( pc_centre_x >= gu_array[i]->get_x() &&
                 pc_centre_x < ( gu_array[i]->get_x() + gu_array[i]->get_w() ) &&
                 pc_centre_y >= gu_array[i]->get_y() &&
                 pc_centre_y < ( gu_array[i]->get_y() + gu_array[i]->get_h() ) ) {
             printf ( "i = %d\n", i );
             break;
-            }
         }
-    return player_location;
     }
+    return player_location;
+}
 
-int main ( int argc, char *argv[] ) {
+int main ( int argc, char *argv[] )
+{
     /* init variables */
     const int SCREEN_WIDTH	= 600;
     const int SCREEN_HEIGHT = 600;
@@ -52,7 +55,7 @@ int main ( int argc, char *argv[] ) {
     if ( font == NULL ) {
         printf ( "wtf font!.\n" );
         return 1;
-        }
+    }
 
     /* init */
     SDL_Init ( SDL_INIT_EVERYTHING );
@@ -73,9 +76,9 @@ int main ( int argc, char *argv[] ) {
             printf ( "wtf\n" );
             x++;
             y = 0;
-            }
-        printf ( "i=%d, x=%d, y=%d\n", i, x, y );
         }
+        printf ( "i=%d, x=%d, y=%d\n", i, x, y );
+    }
 
     PlayerCharacter * pc = new PlayerCharacter ( 220, 240, GRID_SIZE_W, GRID_SIZE_H );
     SDL_Surface *pc_surface = pc->get_surface();
@@ -85,6 +88,28 @@ int main ( int argc, char *argv[] ) {
 
     int counter= 0;
     while ( quit == false ) {
+        while ( SDL_PollEvent ( &event ) ) {
+            Uint8 *keystates = SDL_GetKeyState( NULL );
+            if ( keystates[ SDLK_UP ] ) {
+                pc->set_y ( pc->get_y() - 1 );
+            }
+            //If down is pressed
+            if ( keystates[ SDLK_DOWN ] ) {
+                pc->set_y ( pc->get_y() + 1 );
+            } 
+            //If left is pressed
+            if ( keystates[ SDLK_LEFT ] ) {
+                pc->set_x ( pc->get_x() - 1 );
+            }
+            //If right is pressed
+            if ( keystates[ SDLK_RIGHT ] ) {
+                pc->set_x ( pc->get_x() + 1 );
+            }
+            if ( event.type == SDL_QUIT ) {
+                printf ( "%s %d Quit event decected.\n", __PRETTY_FUNCTION__, __LINE__ );
+                quit = true;
+            }
+        }
         stringstream osd_str;
         osd_str << "count" << counter;
         std::string boo = osd_str.str();
@@ -95,49 +120,45 @@ int main ( int argc, char *argv[] ) {
 
 
         Uint32 bg_colour = SDL_MapRGB ( screen->format, 0, 255, 255 );
-        if ( SDL_FillRect ( screen, &screen->clip_rect, bg_colour ) == -1 ) {
+        if ( SDL_FillRect ( screen, &screen->clip_rect, bg_colour ) ==
+                -1 ) {
             printf ( "%s %d ERROR: failed to fill background colour.\n", __PRETTY_FUNCTION__, __LINE__ );
             return 1;
-            }
+        }
 
         for ( int i = 0; i < grid_total; i++ ) {
-            SDL_Rect gu_location = { gu_array[i]->get_x(), gu_array[i]->get_y(), gu_array[i]->get_w(), gu_array[i]->get_h() };
-            //printf ("%s %d x=%d y=%d w=%d h=%d.\n", __PRETTY_FUNCTION__, __LINE__, gu_array[i]->get_x(), gu_array[i]->get_y(), gu_array[i]->get_w(), gu_array[i]->get_h());
+            SDL_Rect gu_location = { gu_array[i]->get_x(), gu_array[i]->get_y(), gu_array[i]->get_w(),
+                                     gu_array[i]->get_h()
+                                   };
+            //printf ("%s %d x=%d y=%d w=%d h=%d.\n", __PRETTY_FUNCTION__, __LINE__, gu_array[i]->get_x(),
+            gu_array[i]->get_y(), gu_array[i]->get_w(), gu_array[i]->get_h();
             SDL_Surface * gu_surface = gu_array[i]->get_surface();
             if ( gu_surface == NULL ) {
-                printf ( "%s %d ERROR: failed to get gu_surface .\n", __PRETTY_FUNCTION__, __LINE__ );
+            printf ( "%s %d ERROR: failed to get gu_surface .\n", __PRETTY_FUNCTION__, __LINE__ );
                 return 1;
-                }
-            SDL_BlitSurface ( gu_surface, NULL, screen, &gu_location );
             }
+            SDL_BlitSurface ( gu_surface, NULL, screen, &gu_location );
+        }
 
-        pc->set_x(pc->get_x() + 1);
-        pc->set_y(pc->get_y() + 1);
         SDL_Rect pc_location = { pc->get_x(), pc->get_y(), pc->get_w(), pc->get_h() };
-        int pc_grid = player_location ( pc->get_x(), pc->get_y(), pc->get_w(), pc->get_h(), gu_array, grid_total );
-        gu_array[pc_grid]->set_colour ( 255,255,255 );
+//        int pc_grid = player_location ( pc->get_x(), pc->get_y(), pc->get_w(), pc->get_h(), gu_array, grid_total );
+//        gu_array[pc_grid]->set_colour ( 255,255,255 );
         SDL_BlitSurface ( pc_surface, NULL, screen, &pc_location );
         SDL_BlitSurface ( on_screen_display, NULL, screen, &osd_location );
 
         if ( SDL_Flip ( screen ) == -1 ) {
             printf ( "%s %d ERROR: failed to flip.\n", __PRETTY_FUNCTION__, __LINE__ );
             return 1;
-            }
-
-        while ( SDL_PollEvent ( &event ) ) {
-            if ( event.type == SDL_QUIT ) {
-                printf ( "%s %d Quit event decected.\n", __PRETTY_FUNCTION__, __LINE__ );
-                quit = true;
-                }
-            }
-            counter++;
-            SDL_Delay (100);
         }
+
+        counter++;
+        SDL_Delay ( 100 );
+    }
 
     /* clean up */
     for ( int i = 0; i < grid_total; i++ ) {
         delete gu_array[i];
-        }
+    }
     delete gu_array;
     delete pc;
     TTF_CloseFont ( font );
@@ -145,4 +166,4 @@ int main ( int argc, char *argv[] ) {
     SDL_Quit();
 
     return 0;
-    }
+}
