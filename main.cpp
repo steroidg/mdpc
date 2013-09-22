@@ -2,9 +2,14 @@
 #include <SDL_ttf.h>
 #include <iostream>
 #include <sstream>
+#include <vector>
 #include "player_character.hpp"
 #include "grid_unit.hpp"
 
+#define GRID_UP 1
+#define GRID_DOWN 2
+#define GRID_LEFT 3
+#define GRID_RIGHT 4
 
 using namespace std;
 
@@ -31,13 +36,70 @@ SDL_Rect get_pc_location ( int grid_x,
                            int grid_w,
                            int grid_h,
                            int pc_w,
-                           int pc_h ) {
+                           int pc_h )
+{
     int pc_x = grid_x + grid_w/2 - pc_w / 2;
     int pc_y = grid_y + grid_h/2 - pc_h / 2;
-    printf ( "grid_x = %d, grid_y = %d, grid_w = %d, grid_h = %d\n", grid_x, grid_y, grid_w, grid_h);
-    printf ( "pc_x = %d, pc_y = %d, pc_w = %d, pc_h = %d\n", pc_x, pc_y, pc_w, pc_h);
     SDL_Rect retval = { pc_x, pc_y, pc_w, pc_h };
-    
+
+    return retval;
+}
+
+int process_grid_map ( vector< vector<int> > &grid_map, int current_grid, int direction )
+{
+    int grid_x = grid_map.size();
+    int grid_y = grid_map[0].size();
+    int retval = 5;
+
+    for ( int i=0; i<grid_y; i++ ) {
+        for ( int j=0; j<grid_x; j++ ) {
+            if ( current_grid == grid_map[j][i] ) {
+                cout << "grid_map[" <<j << "][" << i << "] = " << grid_map[j][i] << '\n';
+                switch ( direction ) {
+                case GRID_UP:
+                    cout << "UP\n";
+                    if ( i > 0 ) {
+                        retval = grid_map[j][i-1];
+                    } else {
+                        retval = current_grid;
+                    }
+                    cout << "UP retval = " << retval << '\n';
+                    break;
+                case GRID_DOWN:
+                    cout << "DOWN i = " << i << " grid_y = " << grid_y << "\n";
+                    if ( i < (grid_y-1) ) {
+                        retval = grid_map[j][i+1];
+                    } else {
+                        retval = current_grid;
+                    }
+                    cout << "DOWN retval = " << retval << '\n';
+                    break;
+                case GRID_LEFT:
+                    cout << "LEFT\n";
+                    if ( j > 0 ) {
+                        retval = grid_map[j-1][i];
+                    } else {
+                        retval = current_grid;
+                    }
+                    cout << "LEFT retval = " << retval << '\n';
+                    break;
+                case GRID_RIGHT:
+                    cout << "RIGHT j = " << j << " grid_x = " << grid_x << "\n";
+                    if ( j < (grid_x-1) ) {
+                        cout << "got here\n";
+                        retval = grid_map[j+1][i];
+                    } else {
+                        retval = current_grid;
+                    }
+                    cout << "RIGHT retval = " << retval << '\n';
+                    break;
+                default:
+                    retval = current_grid;
+                    cout << "default retval = " << retval << '\n';
+                }
+            }
+        }
+    }
     return retval;
 }
 
@@ -48,7 +110,7 @@ int main ( int argc, char *argv[] )
     const int SCREEN_HEIGHT = 600;
     const int SCREEN_BPP = 32;
     const int GRID_SIZE_W = 50;
-    const int GRID_SIZE_H = 50;
+    const int GRID_SIZE_H = 40;
     const int PC_SIZE_W = 40;
     const int PC_SIZE_H = 40;
     bool quit = false;
@@ -77,15 +139,17 @@ int main ( int argc, char *argv[] )
     int grid_x = SCREEN_WIDTH/GRID_SIZE_W;
     int grid_y = SCREEN_HEIGHT/GRID_SIZE_H;
     int grid_total = grid_x * grid_y;
+    vector< vector<int> > grid_map ( grid_x, vector<int> ( grid_y ) );
 
     GridUnit ** gu_array = new GridUnit*[grid_total];
     int x = 0, y = 0;
     for ( int i = 0; i < grid_total; i++ ) {
+        grid_map[x][y] = i;
         gu_array[i] = new GridUnit ( x*GRID_SIZE_W, y*GRID_SIZE_H, GRID_SIZE_W, GRID_SIZE_H );
-        y++;
-        if ( y == grid_y ) {
-            x++;
-            y = 0;
+        x++;
+        if ( x == grid_x ) {
+            y++;
+            x = 0;
         }
     }
 
@@ -103,19 +167,19 @@ int main ( int argc, char *argv[] )
         while ( SDL_PollEvent ( &event ) ) {
             Uint8 *keystates = SDL_GetKeyState ( NULL );
             if ( keystates[ SDLK_UP ] ) {
-                pc->set_grid ( pc->get_current_grid() + 1 );
+                pc->set_grid ( process_grid_map ( grid_map, pc->get_current_grid(), GRID_UP ) );
             }
             //If down is pressed
             if ( keystates[ SDLK_DOWN ] ) {
-                pc->set_grid ( pc->get_current_grid() - 1 );
+                pc->set_grid ( process_grid_map ( grid_map, pc->get_current_grid(), GRID_DOWN ) );
             }
             //If left is pressed
             if ( keystates[ SDLK_LEFT ] ) {
-                pc->set_x ( pc->get_x() - 1 );
+                pc->set_grid ( process_grid_map ( grid_map, pc->get_current_grid(), GRID_LEFT ) );
             }
             //If right is pressed
             if ( keystates[ SDLK_RIGHT ] ) {
-                pc->set_x ( pc->get_x() + 1 );
+                pc->set_grid ( process_grid_map ( grid_map, pc->get_current_grid(), GRID_RIGHT ) );
             }
             if ( event.type == SDL_QUIT ) {
                 printf ( "%s %d Quit event decected.\n", __PRETTY_FUNCTION__, __LINE__ );
@@ -162,14 +226,14 @@ int main ( int argc, char *argv[] )
             }
             SDL_BlitSurface ( gu_surface, NULL, screen, &gu_location );
         }
-        
+
 //        SDL_Rect pc_location = { pc->get_x(), pc->get_y(), pc->get_w(), pc->get_h() };
         SDL_Rect pc_location = get_pc_location ( gu_array[pc->get_current_grid()]->get_x(),
-                                                 gu_array[pc->get_current_grid()]->get_y(),
-                                                 gu_array[pc->get_current_grid()]->get_w(),
-                                                 gu_array[pc->get_current_grid()]->get_h(),
-                                                 pc->get_w(),
-                                                 pc->get_h() );
+                               gu_array[pc->get_current_grid()]->get_y(),
+                               gu_array[pc->get_current_grid()]->get_w(),
+                               gu_array[pc->get_current_grid()]->get_h(),
+                               pc->get_w(),
+                               pc->get_h() );
         SDL_BlitSurface ( pc_surface, NULL, screen, &pc_location );
         SDL_BlitSurface ( osd, NULL, screen, &osd_location );
 
