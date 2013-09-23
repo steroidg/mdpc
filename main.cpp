@@ -13,7 +13,15 @@
 
 using namespace std;
 
-int player_location ( int x, int y, int w, int h, GridUnit ** gu_array, int grid_total )
+
+// This function goes through the grids to find out which grid
+// is the player characeter currently located. Not sure if needed
+int player_location ( int x,
+                      int y,
+                      int w,
+                      int h,
+                      GridUnit ** gu_array,
+                      int grid_total )
 {
     int player_location = 0;
     int pc_centre_x = x + ( w/2 );
@@ -31,6 +39,9 @@ int player_location ( int x, int y, int w, int h, GridUnit ** gu_array, int grid
     return player_location;
 }
 
+
+// This function returns a SDC_Rect based on the location of an object and size
+// of a grid
 SDL_Rect get_pc_location ( int grid_x,
                            int grid_y,
                            int grid_w,
@@ -45,6 +56,9 @@ SDL_Rect get_pc_location ( int grid_x,
     return retval;
 }
 
+
+// This function gets the grid map, current grid and the direction to move
+// and return the destination grid if movement is possible
 int process_grid_map ( vector< vector<int> > &grid_map, int current_grid, int direction )
 {
     int grid_x = grid_map.size();
@@ -57,45 +71,36 @@ int process_grid_map ( vector< vector<int> > &grid_map, int current_grid, int di
                 cout << "grid_map[" <<j << "][" << i << "] = " << grid_map[j][i] << '\n';
                 switch ( direction ) {
                 case GRID_UP:
-                    cout << "UP\n";
                     if ( i > 0 ) {
                         retval = grid_map[j][i-1];
                     } else {
                         retval = current_grid;
                     }
-                    cout << "UP retval = " << retval << '\n';
                     break;
                 case GRID_DOWN:
-                    cout << "DOWN i = " << i << " grid_y = " << grid_y << "\n";
-                    if ( i < (grid_y-1) ) {
+                    if ( i < ( grid_y-1 ) ) {
                         retval = grid_map[j][i+1];
                     } else {
                         retval = current_grid;
                     }
-                    cout << "DOWN retval = " << retval << '\n';
                     break;
                 case GRID_LEFT:
-                    cout << "LEFT\n";
                     if ( j > 0 ) {
                         retval = grid_map[j-1][i];
                     } else {
                         retval = current_grid;
                     }
-                    cout << "LEFT retval = " << retval << '\n';
                     break;
                 case GRID_RIGHT:
-                    cout << "RIGHT j = " << j << " grid_x = " << grid_x << "\n";
-                    if ( j < (grid_x-1) ) {
+                    if ( j < ( grid_x-1 ) ) {
                         cout << "got here\n";
                         retval = grid_map[j+1][i];
                     } else {
                         retval = current_grid;
                     }
-                    cout << "RIGHT retval = " << retval << '\n';
                     break;
                 default:
                     retval = current_grid;
-                    cout << "default retval = " << retval << '\n';
                 }
             }
         }
@@ -103,6 +108,8 @@ int process_grid_map ( vector< vector<int> > &grid_map, int current_grid, int di
     return retval;
 }
 
+
+// Main function duh!
 int main ( int argc, char *argv[] )
 {
     /* init variables */
@@ -153,13 +160,19 @@ int main ( int argc, char *argv[] )
         }
     }
 
-    PlayerCharacter * pc = new PlayerCharacter ( 0, 0, PC_SIZE_W - 10, PC_SIZE_H - 10, 4 );
+    PlayerCharacter * pc = new PlayerCharacter ( 0, 0, PC_SIZE_W, PC_SIZE_H, 4 );
     SDL_Surface *pc_surface = pc->get_surface();
     if ( pc_surface == NULL ) {
         printf ( "%s %d ERROR: Unable to load pc_surface.\n", __PRETTY_FUNCTION__, __LINE__ );
         return 1;
     }
 
+    PlayerCharacter * pc_mirror = new PlayerCharacter ( 0, 0, PC_SIZE_W - 10, PC_SIZE_H - 10, 28 );
+    SDL_Surface *pc_mirror_surface = pc_mirror->get_surface();
+    if ( pc_mirror_surface == NULL ) {
+        printf ( "%s %d ERROR: Unable to load pc_mirror_surface.\n", __PRETTY_FUNCTION__, __LINE__ );
+        return 1;
+    }
     /* game loop */
     int counter= 0;
     while ( quit == false ) {
@@ -168,18 +181,22 @@ int main ( int argc, char *argv[] )
             Uint8 *keystates = SDL_GetKeyState ( NULL );
             if ( keystates[ SDLK_UP ] ) {
                 pc->set_grid ( process_grid_map ( grid_map, pc->get_current_grid(), GRID_UP ) );
+                pc_mirror->set_grid ( process_grid_map ( grid_map, pc_mirror->get_current_grid(), GRID_DOWN ) );
             }
             //If down is pressed
             if ( keystates[ SDLK_DOWN ] ) {
                 pc->set_grid ( process_grid_map ( grid_map, pc->get_current_grid(), GRID_DOWN ) );
+                pc_mirror->set_grid ( process_grid_map ( grid_map, pc_mirror->get_current_grid(), GRID_UP ) );
             }
             //If left is pressed
             if ( keystates[ SDLK_LEFT ] ) {
                 pc->set_grid ( process_grid_map ( grid_map, pc->get_current_grid(), GRID_LEFT ) );
+                pc_mirror->set_grid ( process_grid_map ( grid_map, pc_mirror->get_current_grid(), GRID_RIGHT ) );
             }
             //If right is pressed
             if ( keystates[ SDLK_RIGHT ] ) {
                 pc->set_grid ( process_grid_map ( grid_map, pc->get_current_grid(), GRID_RIGHT ) );
+                pc_mirror->set_grid ( process_grid_map ( grid_map, pc_mirror->get_current_grid(), GRID_LEFT ) );
             }
             if ( event.type == SDL_QUIT ) {
                 printf ( "%s %d Quit event decected.\n", __PRETTY_FUNCTION__, __LINE__ );
@@ -235,6 +252,15 @@ int main ( int argc, char *argv[] )
                                pc->get_w(),
                                pc->get_h() );
         SDL_BlitSurface ( pc_surface, NULL, screen, &pc_location );
+        
+        SDL_Rect pc_mirron_location = get_pc_location ( gu_array[pc_mirror->get_current_grid()]->get_x(),
+                               gu_array[pc_mirror->get_current_grid()]->get_y(),
+                               gu_array[pc_mirror->get_current_grid()]->get_w(),
+                               gu_array[pc_mirror->get_current_grid()]->get_h(),
+                               pc_mirror->get_w(),
+                               pc_mirror->get_h() );
+        SDL_BlitSurface ( pc_mirror_surface, NULL, screen, &pc_mirron_location );
+        
         SDL_BlitSurface ( osd, NULL, screen, &osd_location );
 
         if ( SDL_Flip ( screen ) == -1 ) {
@@ -243,7 +269,7 @@ int main ( int argc, char *argv[] )
         }
 
         counter++;
-        SDL_Delay ( 100 );
+        SDL_Delay ( 10 );
     }
 
     /* clean up */
