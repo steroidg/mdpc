@@ -4,6 +4,8 @@
 #include <sstream>
 #include <vector>
 #include "player_character.hpp"
+#include "start_point.hpp"
+#include "end_point.hpp"
 #include "grid_unit.hpp"
 
 #define GRID_UP 1
@@ -120,10 +122,13 @@ int main ( int argc, char *argv[] )
     const int GRID_SIZE_H = 40;
     const int PC_SIZE_W = 40;
     const int PC_SIZE_H = 40;
+    const int SP_SIZE_W = 40;
+    const int SP_SIZE_H = 40;
     bool quit = false;
     SDL_Event event;
     SDL_Surface *screen = NULL;
     SDL_Surface *osd = NULL;
+    SDL_Surface *win_msg = NULL;
     TTF_Font *osd_font = NULL;
 
 
@@ -173,6 +178,24 @@ int main ( int argc, char *argv[] )
         printf ( "%s %d ERROR: Unable to load pc_mirror_surface.\n", __PRETTY_FUNCTION__, __LINE__ );
         return 1;
     }
+
+    StartPoint * sp = new StartPoint ( 0, 0, SP_SIZE_W, SP_SIZE_H, 45 );
+    SDL_Surface * sp_surface = sp->get_surface();
+    if ( sp_surface == NULL ) {
+        printf ( "%s %d ERROR: Unable to load sp_surface.\n", __PRETTY_FUNCTION__, __LINE__ );
+        return 1;
+    }
+    
+    EndPoint * ep = new EndPoint ( 0, 0, SP_SIZE_W, SP_SIZE_H, 99 );
+    SDL_Surface * ep_surface = ep->get_surface();
+    if ( ep_surface == NULL ) {
+        printf ( "%s %d ERROR: Unable to load ep_surface.\n", __PRETTY_FUNCTION__, __LINE__ );
+        return 1;
+    }
+
+    win_msg = TTF_RenderText_Solid ( osd_font, "You a winrar!", osd_text_colour );
+    SDL_Rect win_msg_location = {100, 100, 300, 200};
+
     /* game loop */
     int counter= 0;
     while ( quit == false ) {
@@ -252,14 +275,34 @@ int main ( int argc, char *argv[] )
                                pc->get_w(),
                                pc->get_h() );
         SDL_BlitSurface ( pc_surface, NULL, screen, &pc_location );
-        
+
         SDL_Rect pc_mirron_location = get_pc_location ( gu_array[pc_mirror->get_current_grid()]->get_x(),
-                               gu_array[pc_mirror->get_current_grid()]->get_y(),
-                               gu_array[pc_mirror->get_current_grid()]->get_w(),
-                               gu_array[pc_mirror->get_current_grid()]->get_h(),
-                               pc_mirror->get_w(),
-                               pc_mirror->get_h() );
+                                      gu_array[pc_mirror->get_current_grid()]->get_y(),
+                                      gu_array[pc_mirror->get_current_grid()]->get_w(),
+                                      gu_array[pc_mirror->get_current_grid()]->get_h(),
+                                      pc_mirror->get_w(),
+                                      pc_mirror->get_h() );
         SDL_BlitSurface ( pc_mirror_surface, NULL, screen, &pc_mirron_location );
+
+        SDL_Rect sp_location = get_pc_location ( gu_array[sp->get_current_grid()]->get_x(),
+                               gu_array[sp->get_current_grid()]->get_y(),
+                               gu_array[sp->get_current_grid()]->get_w(),
+                               gu_array[sp->get_current_grid()]->get_h(),
+                               sp->get_w(),
+                               sp->get_h() );
+        SDL_BlitSurface ( sp_surface, NULL, screen, &sp_location );
+        
+        SDL_Rect ep_location = get_pc_location ( gu_array[ep->get_current_grid()]->get_x(),
+                               gu_array[ep->get_current_grid()]->get_y(),
+                               gu_array[ep->get_current_grid()]->get_w(),
+                               gu_array[ep->get_current_grid()]->get_h(),
+                               ep->get_w(),
+                               ep->get_h() );
+        SDL_BlitSurface ( ep_surface, NULL, screen, &ep_location );
+
+        if ( pc_mirror->get_current_grid() == ep->get_current_grid() ) {
+            SDL_BlitSurface ( win_msg, NULL, screen, &win_msg_location );
+        }
         
         SDL_BlitSurface ( osd, NULL, screen, &osd_location );
 
@@ -278,6 +321,9 @@ int main ( int argc, char *argv[] )
     }
     delete gu_array;
     delete pc;
+    delete pc_mirror;
+    delete sp;
+    delete ep;
     TTF_CloseFont ( osd_font );
     SDL_FreeSurface ( screen );
     SDL_Quit();
