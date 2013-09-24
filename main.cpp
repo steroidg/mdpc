@@ -137,7 +137,7 @@ int main ( int argc, char *argv[] )
 
     TTF_Init();
     SDL_Color osd_text_colour = { 0, 255, 0 };
-    osd_font = TTF_OpenFont ( "/home/billy/Dropbox/devel/mdpc/Ubuntu-B.ttf", 14 );
+    osd_font = TTF_OpenFont ( "/home/billy/Dropbox/devel/mdpc/fonts/ubuntu/Ubuntu-B.ttf", 14 );
     if ( osd_font == NULL ) {
         printf ( "%s %d ERROR: Unable to load font.\n", __PRETTY_FUNCTION__, __LINE__ );
         return 1;
