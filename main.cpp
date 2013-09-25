@@ -193,6 +193,21 @@ int main ( int argc, char *argv[] )
         return 1;
     }
 
+    StartPoint * pc_mirror_sp = new StartPoint ( 0, 0, SP_SIZE_W, SP_SIZE_H, 108 );
+    SDL_Surface * pc_mirror_sp_surface = pc_mirror_sp->get_surface();
+    if ( pc_mirror_sp_surface == NULL ) {
+        printf ( "%s %d ERROR: Unable to load pc_mirror_sp_surface.\n", __PRETTY_FUNCTION__, __LINE__ );
+        return 1;
+    }
+    
+    EndPoint * pc_mirror_ep = new EndPoint ( 0, 0, SP_SIZE_W, SP_SIZE_H, 120 );
+    SDL_Surface * pc_mirror_ep_surface = pc_mirror_ep->get_surface();
+    if ( pc_mirror_ep_surface == NULL ) {
+        printf ( "%s %d ERROR: Unable to load pc_mirror_ep_surface.\n", __PRETTY_FUNCTION__, __LINE__ );
+        return 1;
+    }
+    
+    
     win_msg = TTF_RenderText_Solid ( osd_font, "You a winrar!", osd_text_colour );
     SDL_Rect win_msg_location = {100, 100, 300, 200};
 
@@ -312,6 +327,23 @@ int main ( int argc, char *argv[] )
                                ep->get_w(),
                                ep->get_h() );
         SDL_BlitSurface ( ep_surface, NULL, screen, &ep_location );
+        
+        SDL_Rect pc_mirror_sp_location = get_pc_location ( gu_array[pc_mirror_sp->get_current_grid()]->get_x(),
+                               gu_array[pc_mirror_sp->get_current_grid()]->get_y(),
+                               gu_array[pc_mirror_sp->get_current_grid()]->get_w(),
+                               gu_array[pc_mirror_sp->get_current_grid()]->get_h(),
+                               pc_mirror_sp->get_w(),
+                               pc_mirror_sp->get_h() );
+        SDL_BlitSurface ( pc_mirror_sp_surface, NULL, screen, &pc_mirror_sp_location );
+        
+        SDL_Rect pc_mirror_ep_location = get_pc_location ( gu_array[pc_mirror_ep->get_current_grid()]->get_x(),
+                               gu_array[pc_mirror_ep->get_current_grid()]->get_y(),
+                               gu_array[pc_mirror_ep->get_current_grid()]->get_w(),
+                               gu_array[pc_mirror_ep->get_current_grid()]->get_h(),
+                               pc_mirror_ep->get_w(),
+                               pc_mirror_ep->get_h() );
+        SDL_BlitSurface ( pc_mirror_ep_surface, NULL, screen, &pc_mirror_ep_location );
+
 
         if ( pc_mirror->get_current_grid() == ep->get_current_grid() ) {
             SDL_BlitSurface ( win_msg, NULL, screen, &win_msg_location );
