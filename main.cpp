@@ -198,28 +198,36 @@ int main ( int argc, char *argv[] )
 
     /* game loop */
     int counter= 0;
+    int pc_grid = 0;
+    int pc_mirror_grid = 0;
+    int pc_tmp_grid = 0;
+    int pc_mirror_tmp_grid = 0;
     while ( quit == false ) {
         // Event handler
+        pc_grid = pc->get_current_grid();
+        pc_tmp_grid = pc->get_current_grid();
+        pc_mirror_grid = pc_mirror->get_current_grid();
+        pc_mirror_tmp_grid = pc_mirror->get_current_grid();
         while ( SDL_PollEvent ( &event ) ) {
             Uint8 *keystates = SDL_GetKeyState ( NULL );
             if ( keystates[ SDLK_UP ] ) {
-                pc->set_grid ( process_grid_map ( grid_map, pc->get_current_grid(), GRID_UP ) );
-                pc_mirror->set_grid ( process_grid_map ( grid_map, pc_mirror->get_current_grid(), GRID_DOWN ) );
+                pc_tmp_grid = ( process_grid_map ( grid_map, pc->get_current_grid(), GRID_UP ) );
+                pc_mirror_tmp_grid = ( process_grid_map ( grid_map, pc_mirror->get_current_grid(), GRID_DOWN ) );
             }
             //If down is pressed
             if ( keystates[ SDLK_DOWN ] ) {
-                pc->set_grid ( process_grid_map ( grid_map, pc->get_current_grid(), GRID_DOWN ) );
-                pc_mirror->set_grid ( process_grid_map ( grid_map, pc_mirror->get_current_grid(), GRID_UP ) );
+                pc_tmp_grid = ( process_grid_map ( grid_map, pc->get_current_grid(), GRID_DOWN ) );
+                pc_mirror_tmp_grid = ( process_grid_map ( grid_map, pc_mirror->get_current_grid(), GRID_UP ) );
             }
             //If left is pressed
             if ( keystates[ SDLK_LEFT ] ) {
-                pc->set_grid ( process_grid_map ( grid_map, pc->get_current_grid(), GRID_LEFT ) );
-                pc_mirror->set_grid ( process_grid_map ( grid_map, pc_mirror->get_current_grid(), GRID_RIGHT ) );
+                pc_tmp_grid = ( process_grid_map ( grid_map, pc->get_current_grid(), GRID_LEFT ) );
+                pc_mirror_tmp_grid = ( process_grid_map ( grid_map, pc_mirror->get_current_grid(), GRID_RIGHT ) );
             }
             //If right is pressed
             if ( keystates[ SDLK_RIGHT ] ) {
-                pc->set_grid ( process_grid_map ( grid_map, pc->get_current_grid(), GRID_RIGHT ) );
-                pc_mirror->set_grid ( process_grid_map ( grid_map, pc_mirror->get_current_grid(), GRID_LEFT ) );
+                pc_tmp_grid = ( process_grid_map ( grid_map, pc->get_current_grid(), GRID_RIGHT ) );
+                pc_mirror_tmp_grid = ( process_grid_map ( grid_map, pc_mirror->get_current_grid(), GRID_LEFT ) );
             }
             if ( event.type == SDL_QUIT ) {
                 printf ( "%s %d Quit event decected.\n", __PRETTY_FUNCTION__, __LINE__ );
@@ -227,6 +235,11 @@ int main ( int argc, char *argv[] )
             }
         }
 
+            if (( pc_grid != pc_tmp_grid) && (pc_mirror_grid != pc_mirror_tmp_grid)) {
+                cout << "boo\n";
+                pc->set_grid(pc_tmp_grid);
+                pc_mirror->set_grid(pc_mirror_tmp_grid);
+            }
         // Display on screen data
         stringstream osd_str;
         osd_str << "count" << counter;
