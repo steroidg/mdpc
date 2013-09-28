@@ -3,6 +3,7 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
+#include <time.h>
 #include "player_character.hpp"
 #include "start_point.hpp"
 #include "end_point.hpp"
@@ -58,7 +59,6 @@ SDL_Rect get_pc_location ( int grid_x,
     return retval;
 }
 
-
 // This function gets the grid map, current grid and the direction to move
 // and return the destination grid if movement is possible
 int process_grid_map ( vector< vector<int> > &grid_map, int current_grid, int direction )
@@ -70,7 +70,7 @@ int process_grid_map ( vector< vector<int> > &grid_map, int current_grid, int di
     for ( int i=0; i<grid_y; i++ ) {
         for ( int j=0; j<grid_x; j++ ) {
             if ( current_grid == grid_map[j][i] ) {
-                cout << "grid_map[" <<j << "][" << i << "] = " << grid_map[j][i] << '\n';
+                //cout << "grid_map[" <<j << "][" << i << "] = " << grid_map[j][i] << '\n';
                 switch ( direction ) {
                 case GRID_UP:
                     if ( i > 0 ) {
@@ -95,7 +95,6 @@ int process_grid_map ( vector< vector<int> > &grid_map, int current_grid, int di
                     break;
                 case GRID_RIGHT:
                     if ( j < ( grid_x-1 ) ) {
-                        cout << "got here\n";
                         retval = grid_map[j+1][i];
                     } else {
                         retval = current_grid;
@@ -115,11 +114,11 @@ int process_grid_map ( vector< vector<int> > &grid_map, int current_grid, int di
 int main ( int argc, char *argv[] )
 {
     /* init variables */
-    const int SCREEN_WIDTH = 600;
-    const int SCREEN_HEIGHT = 600;
+    const int SCREEN_WIDTH = 1000;
+    const int SCREEN_HEIGHT = 800;
     const int SCREEN_BPP = 32;
     const int GRID_SIZE_W = 50;
-    const int GRID_SIZE_H = 40;
+    const int GRID_SIZE_H = 50;
     const int PC_SIZE_W = 40;
     const int PC_SIZE_H = 40;
     const int SP_SIZE_W = 40;
@@ -165,7 +164,7 @@ int main ( int argc, char *argv[] )
         }
     }
 
-    PlayerCharacter * pc = new PlayerCharacter ( 0, 0, PC_SIZE_W, PC_SIZE_H, 4 );
+    PlayerCharacter * pc = new PlayerCharacter ( 0, 0, PC_SIZE_W, PC_SIZE_H, (rand() % grid_total) );
     SDL_Surface *pc_surface = pc->get_surface();
     if ( pc_surface == NULL ) {
         printf ( "%s %d ERROR: Unable to load pc_surface.\n", __PRETTY_FUNCTION__, __LINE__ );
@@ -206,6 +205,56 @@ int main ( int argc, char *argv[] )
         printf ( "%s %d ERROR: Unable to load pc_mirror_ep_surface.\n", __PRETTY_FUNCTION__, __LINE__ );
         return 1;
     }
+    
+    srand (time(0));
+    int pc_start = rand() % grid_total;
+    int pc_mirror_start = pc_start;
+    while ( pc_mirror_start == pc_start ) {
+        pc_mirror_start = rand() %grid_total;
+    cout << "pc_start = " << pc_start << endl;
+    cout << "pc_mirror_start = " << pc_mirror_start << endl;
+    }
+    
+    pc->set_grid(pc_start);
+    pc_mirror->set_grid(pc_mirror_start);
+    sp->set_grid(pc_start);
+    pc_mirror_sp->set_grid(pc_mirror_start);
+    
+    int pc_end = pc_start;
+    int pc_mirror_end = pc_mirror_start;
+    int nmoves = rand() % 100 + 50;
+    cout << "nmoves = " << nmoves << endl;
+    
+    for (int i = 0; i < nmoves; i++) {
+        int move_direction = rand() %4 + 1;
+        int pc_end_tmp = pc_end;
+        int pc_mirror_end_tmp = pc_mirror_end;
+        
+        if ( move_direction == GRID_UP ) {
+            pc_end_tmp = ( process_grid_map ( grid_map, pc_end, GRID_UP ) );
+            pc_mirror_end_tmp = ( process_grid_map ( grid_map, pc_mirror_end, GRID_DOWN ) );
+        } else if ( move_direction == GRID_DOWN ) {
+            pc_end_tmp = ( process_grid_map ( grid_map, pc_end, GRID_DOWN ) );
+            pc_mirror_end_tmp = ( process_grid_map ( grid_map, pc_mirror_end, GRID_UP ) );
+        } else if ( move_direction == GRID_LEFT ) {
+            pc_end_tmp = ( process_grid_map ( grid_map, pc_end, GRID_LEFT ) );
+            pc_mirror_end_tmp = ( process_grid_map ( grid_map, pc_mirror_end, GRID_RIGHT ) );
+        } else if ( move_direction == GRID_RIGHT ) {
+            pc_end_tmp = ( process_grid_map ( grid_map, pc_end, GRID_RIGHT ) );
+            pc_mirror_end_tmp = ( process_grid_map ( grid_map, pc_mirror_end, GRID_LEFT ) );
+        }
+        
+        if (( pc_end != pc_end_tmp) && (pc_mirror_end != pc_mirror_end_tmp)) {
+            pc_end = pc_end_tmp;
+            pc_mirror_end = pc_mirror_end_tmp;
+        }
+        cout << move_direction << endl;
+        cout << pc_end << endl;
+        cout << pc_mirror_end << endl;
+    }
+    
+    ep->set_grid(pc_end);
+    pc_mirror_ep->set_grid(pc_mirror_end);
     
     
     win_msg = TTF_RenderText_Solid ( osd_font, "You a winrar!", osd_text_colour );
@@ -251,7 +300,6 @@ int main ( int argc, char *argv[] )
         }
 
             if (( pc_grid != pc_tmp_grid) && (pc_mirror_grid != pc_mirror_tmp_grid)) {
-                cout << "boo\n";
                 pc->set_grid(pc_tmp_grid);
                 pc_mirror->set_grid(pc_mirror_tmp_grid);
             }
@@ -345,7 +393,7 @@ int main ( int argc, char *argv[] )
         SDL_BlitSurface ( pc_mirror_ep_surface, NULL, screen, &pc_mirror_ep_location );
 
 
-        if ( pc_mirror->get_current_grid() == ep->get_current_grid() ) {
+        if ( pc_mirror->get_current_grid() == pc_mirror_ep->get_current_grid() ) {
             SDL_BlitSurface ( win_msg, NULL, screen, &win_msg_location );
         }
         
