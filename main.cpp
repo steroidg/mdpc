@@ -156,7 +156,7 @@ int main ( int argc, char *argv[] )
     int x = 0, y = 0;
     for ( int i = 0; i < grid_total; i++ ) {
         grid_map[x][y] = i;
-        gu_array[i] = new GridUnit ( x*GRID_SIZE_W, y*GRID_SIZE_H, GRID_SIZE_W, GRID_SIZE_H );
+        gu_array[i] = new GridUnit ( x*GRID_SIZE_W, y*GRID_SIZE_H, GRID_SIZE_W, GRID_SIZE_H, SCREEN_BPP );
         x++;
         if ( x == grid_x ) {
             y++;
