@@ -222,7 +222,7 @@ int main ( int argc, char *argv[] )
     
     int pc_end = pc_start;
     int pc_mirror_end = pc_mirror_start;
-    int nmoves = rand() % 100 + 50;
+    int nmoves = rand() % 300 + 200;
     cout << "nmoves = " << nmoves << endl;
     
     for (int i = 0; i < nmoves; i++) {
@@ -374,7 +374,7 @@ int main ( int argc, char *argv[] )
                                gu_array[ep->get_current_grid()]->get_h(),
                                ep->get_w(),
                                ep->get_h() );
-        SDL_BlitSurface ( ep_surface, NULL, screen, &ep_location );
+        //SDL_BlitSurface ( ep_surface, NULL, screen, &ep_location );
         
         SDL_Rect pc_mirror_sp_location = get_pc_location ( gu_array[pc_mirror_sp->get_current_grid()]->get_x(),
                                gu_array[pc_mirror_sp->get_current_grid()]->get_y(),
