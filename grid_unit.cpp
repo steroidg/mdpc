@@ -23,6 +23,7 @@ GridUnit::GridUnit ( int x, int y, int w, int h, int bpp ) : BasicDrawableObject
     this->render(0, 0, 150);
 }
 
+
 GridUnit::~GridUnit()
 {
     SDL_FreeSurface ( surface );
