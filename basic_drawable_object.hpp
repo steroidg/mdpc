@@ -1,3 +1,5 @@
+#ifndef BASIC_DRAWABLE_OBJECT_H
+#define BASIC_DRAWABLE_OBJECT_H
 #include <SDL.h>
 
 class BasicDrawableObject
@@ -23,3 +25,5 @@ protected:
     int h;
     int bpp;
 };
+
+#endif

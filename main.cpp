@@ -4,10 +4,10 @@
 #include <sstream>
 #include <vector>
 #include <time.h>
-#include "player_character.hpp"
 #include "start_point.hpp"
 #include "end_point.hpp"
 #include "grid_unit.hpp"
+#include "player_character.hpp"
 
 #define GRID_UP 1
 #define GRID_DOWN 2
@@ -164,14 +164,15 @@ int main ( int argc, char *argv[] )
         }
     }
 
-    PlayerCharacter * pc = new PlayerCharacter ( 0, 0, PC_SIZE_W, PC_SIZE_H, (rand() % grid_total) );
+    PlayerCharacter * pc = new PlayerCharacter ( 0, 0, PC_SIZE_W, PC_SIZE_H, SCREEN_BPP, (rand() % grid_total) );
     SDL_Surface *pc_surface = pc->get_surface();
     if ( pc_surface == NULL ) {
         printf ( "%s %d ERROR: Unable to load pc_surface.\n", __PRETTY_FUNCTION__, __LINE__ );
         return 1;
     }
 
-    PlayerCharacter * pc_mirror = new PlayerCharacter ( 0, 0, PC_SIZE_W - 10, PC_SIZE_H - 10, 28 );
+    PlayerCharacter * pc_mirror = new PlayerCharacter ( 0, 0, PC_SIZE_W - 10, PC_SIZE_H - 10, SCREEN_BPP, (rand() %
+grid_total) );
     SDL_Surface *pc_mirror_surface = pc_mirror->get_surface();
     if ( pc_mirror_surface == NULL ) {
         printf ( "%s %d ERROR: Unable to load pc_mirror_surface.\n", __PRETTY_FUNCTION__, __LINE__ );
