@@ -4,10 +4,8 @@
 #include <sstream>
 #include <vector>
 #include <time.h>
-#include "start_point.hpp"
-#include "end_point.hpp"
 #include "grid_unit.hpp"
-#include "player_character.hpp"
+#include "moveable_object.hpp"
 
 #define GRID_UP 1
 #define GRID_DOWN 2
@@ -147,8 +145,8 @@ int main ( int argc, char *argv[] )
         return 1;
     }
 
-    int grid_x = SCREEN_WIDTH/GRID_SIZE_W;
-    int grid_y = SCREEN_HEIGHT/GRID_SIZE_H;
+    int grid_x = SCREEN_WIDTH / GRID_SIZE_W;
+    int grid_y = SCREEN_HEIGHT / GRID_SIZE_H;
     int grid_total = grid_x * grid_y;
     vector< vector<int> > grid_map ( grid_x, vector<int> ( grid_y ) );
 
@@ -164,14 +162,14 @@ int main ( int argc, char *argv[] )
         }
     }
 
-    PlayerCharacter * pc = new PlayerCharacter ( 0, 0, PC_SIZE_W, PC_SIZE_H, SCREEN_BPP, (rand() % grid_total) );
+    MoveableObject * pc = new MoveableObject ( 0, 0, PC_SIZE_W, PC_SIZE_H, SCREEN_BPP, (rand() % grid_total) );
     SDL_Surface *pc_surface = pc->get_surface();
     if ( pc_surface == NULL ) {
         printf ( "%s %d ERROR: Unable to load pc_surface.\n", __PRETTY_FUNCTION__, __LINE__ );
         return 1;
     }
 
-    PlayerCharacter * pc_mirror = new PlayerCharacter ( 0, 0, PC_SIZE_W - 10, PC_SIZE_H - 10, SCREEN_BPP, (rand() %
+    MoveableObject * pc_mirror = new MoveableObject ( 0, 0, PC_SIZE_W - 10, PC_SIZE_H - 10, SCREEN_BPP, (rand() %
 grid_total) );
     SDL_Surface *pc_mirror_surface = pc_mirror->get_surface();
     if ( pc_mirror_surface == NULL ) {
@@ -179,28 +177,28 @@ grid_total) );
         return 1;
     }
 
-    StartPoint * sp = new StartPoint ( 0, 0, SP_SIZE_W, SP_SIZE_H, 45 );
+    MoveableObject * sp = new MoveableObject ( 0, 0, SP_SIZE_W, SP_SIZE_H, SCREEN_BPP, 45 );
     SDL_Surface * sp_surface = sp->get_surface();
     if ( sp_surface == NULL ) {
         printf ( "%s %d ERROR: Unable to load sp_surface.\n", __PRETTY_FUNCTION__, __LINE__ );
         return 1;
     }
     
-    EndPoint * ep = new EndPoint ( 0, 0, SP_SIZE_W, SP_SIZE_H, 99 );
+    MoveableObject * ep = new MoveableObject ( 0, 0, SP_SIZE_W, SP_SIZE_H, SCREEN_BPP, 99 );
     SDL_Surface * ep_surface = ep->get_surface();
     if ( ep_surface == NULL ) {
         printf ( "%s %d ERROR: Unable to load ep_surface.\n", __PRETTY_FUNCTION__, __LINE__ );
         return 1;
     }
 
-    StartPoint * pc_mirror_sp = new StartPoint ( 0, 0, SP_SIZE_W, SP_SIZE_H, 108 );
+    MoveableObject * pc_mirror_sp = new MoveableObject ( 0, 0, SP_SIZE_W, SP_SIZE_H, SCREEN_BPP, 108 );
     SDL_Surface * pc_mirror_sp_surface = pc_mirror_sp->get_surface();
     if ( pc_mirror_sp_surface == NULL ) {
         printf ( "%s %d ERROR: Unable to load pc_mirror_sp_surface.\n", __PRETTY_FUNCTION__, __LINE__ );
         return 1;
     }
     
-    EndPoint * pc_mirror_ep = new EndPoint ( 0, 0, SP_SIZE_W, SP_SIZE_H, 120 );
+    MoveableObject * pc_mirror_ep = new MoveableObject ( 0, 0, SP_SIZE_W, SP_SIZE_H, SCREEN_BPP, 120 );
     SDL_Surface * pc_mirror_ep_surface = pc_mirror_ep->get_surface();
     if ( pc_mirror_ep_surface == NULL ) {
         printf ( "%s %d ERROR: Unable to load pc_mirror_ep_surface.\n", __PRETTY_FUNCTION__, __LINE__ );

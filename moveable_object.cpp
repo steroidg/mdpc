@@ -1,10 +1,10 @@
-#include "player_character.hpp"
+#include "moveable_object.hpp"
 #include <iostream>
 
 using namespace std;
 
-PlayerCharacter::PlayerCharacter ( int x, int y, int w, int h, int bpp, int grid ) : BasicDrawableObject ( x, y, w, h,
-bpp )
+MoveableObject::MoveableObject ( int x, int y, int w, int h, int bpp, int grid ): BasicDrawableObject ( x, y, w, h, bpp
+)
 {
     surface = NULL;
     this->x = x;
@@ -31,17 +31,17 @@ bpp )
     }
 }
 
-PlayerCharacter::~PlayerCharacter()
+MoveableObject::~MoveableObject()
 {
     SDL_FreeSurface ( surface );
 }
 
-int PlayerCharacter::get_current_grid()
+int MoveableObject::get_current_grid()
 {
     return current_grid;
 }
 
-void PlayerCharacter::set_grid ( int grid )
+void MoveableObject::set_grid ( int grid )
 {
     this->current_grid = grid;
 }
