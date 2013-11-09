@@ -156,7 +156,7 @@ int main ( int argc, char * argv[] )
     vector<sdl_surface_ptr> game_screen_vec;
     bool quit = false;
     SDL_Surface * game_screen_ptr = NULL;
-    SDL_Surface *osd = NULL;
+    sdl_surface_ptr osd;
     SDL_Surface *win_msg = NULL;
     TTF_Font *osd_font = NULL;
     SDL_Event event;
@@ -361,7 +361,7 @@ game_screen_ptr->format->BitsPerPixel,
         std::string boo = osd_str.str();
         const char * whoa = boo.c_str();
 
-        osd = TTF_RenderText_Solid ( osd_font, whoa, osd_text_colour );
+        osd = sdl_surface_ptr (TTF_RenderText_Solid ( osd_font, whoa, osd_text_colour ));
         if ( osd == NULL ) {
             printf ( "%s %d ERROR: Unable to load osd.\n", __PRETTY_FUNCTION__, __LINE__ );
             return 1;
@@ -449,7 +449,7 @@ game_screen_ptr->format->BitsPerPixel,
             SDL_BlitSurface ( win_msg, NULL, game_screen_ptr, &win_msg_location );
         }
         
-        SDL_BlitSurface ( osd, NULL, game_screen_ptr, &osd_location );
+        SDL_BlitSurface ( &(*osd), NULL, game_screen_ptr, &osd_location );
 
         if ( SDL_Flip ( game_screen_ptr ) == -1 ) {
             printf ( "%s %d ERROR: failed to flip.\n", __PRETTY_FUNCTION__, __LINE__ );
