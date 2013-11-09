@@ -157,7 +157,7 @@ int main ( int argc, char * argv[] )
     bool quit = false;
     SDL_Surface * game_screen_ptr = NULL;
     sdl_surface_ptr osd;
-    SDL_Surface *win_msg = NULL;
+    sdl_surface_ptr win_msg;
     TTF_Font *osd_font = NULL;
     SDL_Event event;
     
@@ -309,7 +309,7 @@ game_screen_ptr->format->BitsPerPixel,
     pc_mirror_ep->set_grid(pc_mirror_end);
     
     
-    win_msg = TTF_RenderText_Solid ( osd_font, "You a winrar!", osd_text_colour );
+    win_msg = sdl_surface_ptr(TTF_RenderText_Solid ( osd_font, "You a winrar!", osd_text_colour ));
     SDL_Rect win_msg_location = {100, 100, 300, 200};
 
     /* game loop */
@@ -446,7 +446,7 @@ game_screen_ptr->format->BitsPerPixel,
 
 
         if ( pc_mirror->get_current_grid() == pc_mirror_ep->get_current_grid() ) {
-            SDL_BlitSurface ( win_msg, NULL, game_screen_ptr, &win_msg_location );
+            SDL_BlitSurface ( &(*win_msg), NULL, game_screen_ptr, &win_msg_location );
         }
         
         SDL_BlitSurface ( &(*osd), NULL, game_screen_ptr, &osd_location );
