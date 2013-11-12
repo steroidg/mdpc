@@ -1,5 +1,4 @@
 #include "grid_unit.hpp"
-#include <iostream>
 
 using namespace std;
 

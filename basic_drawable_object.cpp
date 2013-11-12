@@ -1,5 +1,4 @@
 #include "basic_drawable_object.hpp"
-#include <iostream>
 
 using namespace std;
 

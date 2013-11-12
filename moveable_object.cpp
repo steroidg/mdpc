@@ -1,5 +1,4 @@
 #include "moveable_object.hpp"
-#include <iostream>
 
 using namespace std;
 
