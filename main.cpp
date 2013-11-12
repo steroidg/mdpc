@@ -1,11 +1,4 @@
-#include <SDL.h>
-#include <SDL_ttf.h>
-#include <iostream>
-#include <sstream>
-#include <vector>
-#include <time.h>
-#include <tr1/memory>
-#include <boost/shared_ptr.hpp>
+#include "mdpc.hpp"
 #include "basic_drawable_object.hpp"
 #include "grid_unit.hpp"
 #include "moveable_object.hpp"
@@ -16,7 +9,6 @@
 #define GRID_RIGHT 4
 
 using namespace std;
-typedef boost::shared_ptr<SDL_Surface> sdl_surface_ptr;
 
 // This function goes through the grids to find out which grid
 // is the player characeter currently located. Not sure if needed
@@ -209,7 +201,7 @@ game_screen_ptr->format->BitsPerPixel );
     MoveableObject * pc = new MoveableObject ( 0, 0, character_size_w, character_size_h,
 game_screen_ptr->format->BitsPerPixel, (rand() %
 grid_total) );
-    SDL_Surface *pc_surface = pc->get_surface();
+    sdl_surface_ptr pc_surface = pc->get_surface();
     if ( pc_surface == NULL ) {
         printf ( "%s %d ERROR: Unable to load pc_surface.\n", __PRETTY_FUNCTION__, __LINE__ );
         return 1;
@@ -218,7 +210,7 @@ grid_total) );
     MoveableObject * pc_mirror = new MoveableObject ( 0, 0, character_size_w - 10, character_size_h - 10,
 game_screen_ptr->format->BitsPerPixel, (rand() %
 grid_total) );
-    SDL_Surface *pc_mirror_surface = pc_mirror->get_surface();
+    sdl_surface_ptr pc_mirror_surface = pc_mirror->get_surface();
     if ( pc_mirror_surface == NULL ) {
         printf ( "%s %d ERROR: Unable to load pc_mirror_surface.\n", __PRETTY_FUNCTION__, __LINE__ );
         return 1;
@@ -226,7 +218,7 @@ grid_total) );
 
     MoveableObject * sp = new MoveableObject ( 0, 0, start_point_size_w, start_point_size_h,
 game_screen_ptr->format->BitsPerPixel, 45 );
-    SDL_Surface * sp_surface = sp->get_surface();
+    sdl_surface_ptr sp_surface = sp->get_surface();
     if ( sp_surface == NULL ) {
         printf ( "%s %d ERROR: Unable to load sp_surface.\n", __PRETTY_FUNCTION__, __LINE__ );
         return 1;
@@ -234,7 +226,7 @@ game_screen_ptr->format->BitsPerPixel, 45 );
     
     MoveableObject * ep = new MoveableObject ( 0, 0, start_point_size_w, start_point_size_h,
 game_screen_ptr->format->BitsPerPixel, 99 );
-    SDL_Surface * ep_surface = ep->get_surface();
+    sdl_surface_ptr ep_surface = ep->get_surface();
     if ( ep_surface == NULL ) {
         printf ( "%s %d ERROR: Unable to load ep_surface.\n", __PRETTY_FUNCTION__, __LINE__ );
         return 1;
@@ -243,7 +235,7 @@ game_screen_ptr->format->BitsPerPixel, 99 );
     MoveableObject * pc_mirror_sp = new MoveableObject ( 0, 0, start_point_size_w, start_point_size_h,
 game_screen_ptr->format->BitsPerPixel,
 108 );
-    SDL_Surface * pc_mirror_sp_surface = pc_mirror_sp->get_surface();
+    sdl_surface_ptr pc_mirror_sp_surface = pc_mirror_sp->get_surface();
     if ( pc_mirror_sp_surface == NULL ) {
         printf ( "%s %d ERROR: Unable to load pc_mirror_sp_surface.\n", __PRETTY_FUNCTION__, __LINE__ );
         return 1;
@@ -252,7 +244,7 @@ game_screen_ptr->format->BitsPerPixel,
     MoveableObject * pc_mirror_ep = new MoveableObject ( 0, 0, start_point_size_w, start_point_size_h,
 game_screen_ptr->format->BitsPerPixel,
 120 );
-    SDL_Surface * pc_mirror_ep_surface = pc_mirror_ep->get_surface();
+    sdl_surface_ptr pc_mirror_ep_surface = pc_mirror_ep->get_surface();
     if ( pc_mirror_ep_surface == NULL ) {
         printf ( "%s %d ERROR: Unable to load pc_mirror_ep_surface.\n", __PRETTY_FUNCTION__, __LINE__ );
         return 1;
@@ -387,12 +379,12 @@ game_screen_ptr->format->BitsPerPixel,
             gu_array[i]->get_w();
             gu_array[i]->get_h();
 
-            SDL_Surface * gu_surface = gu_array[i]->get_surface();
+            sdl_surface_ptr gu_surface = gu_array[i]->get_surface();
             if ( gu_surface == NULL ) {
                 printf ( "%s %d ERROR: failed to get gu_surface .\n", __PRETTY_FUNCTION__, __LINE__ );
                 return 1;
             }
-            SDL_BlitSurface ( gu_surface, NULL, game_screen_ptr, &gu_location );
+            SDL_BlitSurface ( &(*gu_surface), NULL, game_screen_ptr, &gu_location );
         }
 
 //        SDL_Rect pc_location = { pc->get_x(), pc->get_y(), pc->get_w(), pc->get_h() };
@@ -402,7 +394,7 @@ game_screen_ptr->format->BitsPerPixel,
                                gu_array[pc->get_current_grid()]->get_h(),
                                pc->get_w(),
                                pc->get_h() );
-        SDL_BlitSurface ( pc_surface, NULL, game_screen_ptr, &pc_location );
+        SDL_BlitSurface ( &(*pc_surface), NULL, game_screen_ptr, &pc_location );
 
         SDL_Rect pc_mirron_location = get_pc_location ( gu_array[pc_mirror->get_current_grid()]->get_x(),
                                       gu_array[pc_mirror->get_current_grid()]->get_y(),
@@ -410,7 +402,7 @@ game_screen_ptr->format->BitsPerPixel,
                                       gu_array[pc_mirror->get_current_grid()]->get_h(),
                                       pc_mirror->get_w(),
                                       pc_mirror->get_h() );
-        SDL_BlitSurface ( pc_mirror_surface, NULL, game_screen_ptr, &pc_mirron_location );
+        SDL_BlitSurface ( &(*pc_mirror_surface), NULL, game_screen_ptr, &pc_mirron_location );
 
         SDL_Rect sp_location = get_pc_location ( gu_array[sp->get_current_grid()]->get_x(),
                                gu_array[sp->get_current_grid()]->get_y(),
@@ -418,7 +410,7 @@ game_screen_ptr->format->BitsPerPixel,
                                gu_array[sp->get_current_grid()]->get_h(),
                                sp->get_w(),
                                sp->get_h() );
-        SDL_BlitSurface ( sp_surface, NULL, game_screen_ptr, &sp_location );
+        SDL_BlitSurface ( &(*sp_surface), NULL, game_screen_ptr, &sp_location );
         
         SDL_Rect ep_location = get_pc_location ( gu_array[ep->get_current_grid()]->get_x(),
                                gu_array[ep->get_current_grid()]->get_y(),
@@ -434,7 +426,7 @@ game_screen_ptr->format->BitsPerPixel,
                                gu_array[pc_mirror_sp->get_current_grid()]->get_h(),
                                pc_mirror_sp->get_w(),
                                pc_mirror_sp->get_h() );
-        SDL_BlitSurface ( pc_mirror_sp_surface, NULL, game_screen_ptr, &pc_mirror_sp_location );
+        SDL_BlitSurface ( &(*pc_mirror_sp_surface), NULL, game_screen_ptr, &pc_mirror_sp_location );
         
         SDL_Rect pc_mirror_ep_location = get_pc_location ( gu_array[pc_mirror_ep->get_current_grid()]->get_x(),
                                gu_array[pc_mirror_ep->get_current_grid()]->get_y(),
@@ -442,7 +434,7 @@ game_screen_ptr->format->BitsPerPixel,
                                gu_array[pc_mirror_ep->get_current_grid()]->get_h(),
                                pc_mirror_ep->get_w(),
                                pc_mirror_ep->get_h() );
-        SDL_BlitSurface ( pc_mirror_ep_surface, NULL, game_screen_ptr, &pc_mirror_ep_location );
+        SDL_BlitSurface ( &(*pc_mirror_ep_surface), NULL, game_screen_ptr, &pc_mirror_ep_location );
 
 
         if ( pc_mirror->get_current_grid() == pc_mirror_ep->get_current_grid() ) {

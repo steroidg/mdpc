@@ -1,13 +1,13 @@
 #ifndef BASIC_DRAWABLE_OBJECT_H
 #define BASIC_DRAWABLE_OBJECT_H
-#include <SDL.h>
+#include "mdpc.hpp"
 
 class BasicDrawableObject
 {
 public:
     BasicDrawableObject ( int x, int y, int w, int h, int bpp );
     ~BasicDrawableObject ();
-    SDL_Surface * get_surface ();
+    sdl_surface_ptr get_surface ();
     int get_x ();
     int get_y ();
     int get_w ();
@@ -18,7 +18,7 @@ public:
     void set_h ( int h );
 
 protected:
-    SDL_Surface * surface;
+    sdl_surface_ptr surface;
     int x;
     int y;
     int w;

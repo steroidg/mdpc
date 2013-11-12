@@ -6,7 +6,6 @@ using namespace std;
 MoveableObject::MoveableObject ( int x, int y, int w, int h, int bpp, int grid ): BasicDrawableObject ( x, y, w, h, bpp
 )
 {
-    surface = NULL;
     this->x = x;
     this->y = y;
     this->w = w;
@@ -14,7 +13,7 @@ MoveableObject::MoveableObject ( int x, int y, int w, int h, int bpp, int grid )
     this->bpp = bpp;
     this->current_grid = grid;
 
-    surface = SDL_CreateRGBSurface ( 0, w, h, bpp, 0, 0, 0, 0 );
+    surface = sdl_surface_ptr(SDL_CreateRGBSurface ( 0, w, h, bpp, 0, 0, 0, 0 ));
     if ( surface == NULL ) {
         cout << __PRETTY_FUNCTION__ << " "
              << __LINE__ << " "
@@ -23,7 +22,7 @@ MoveableObject::MoveableObject ( int x, int y, int w, int h, int bpp, int grid )
     }
 
     Uint32 colour = SDL_MapRGB ( surface->format, 255, 255, 0 );
-    if ( SDL_FillRect ( surface, &surface->clip_rect , colour ) == -1 ) {
+    if ( SDL_FillRect ( &(*surface), &surface->clip_rect , colour ) == -1 ) {
         cout << __PRETTY_FUNCTION__ << " "
              << __LINE__ << " "
              << "ERROR: failed to fill grid colour."
@@ -33,7 +32,7 @@ MoveableObject::MoveableObject ( int x, int y, int w, int h, int bpp, int grid )
 
 MoveableObject::~MoveableObject()
 {
-    SDL_FreeSurface ( surface );
+//    SDL_FreeSurface ( surface );
 }
 
 int MoveableObject::get_current_grid()

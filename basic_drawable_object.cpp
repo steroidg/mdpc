@@ -10,9 +10,8 @@ BasicDrawableObject::BasicDrawableObject ( int x, int y, int w, int h, int bpp )
     this->w = w;
     this->h = h;
     this->bpp = bpp;
-    surface = NULL;
 
-    surface = SDL_CreateRGBSurface ( 0, w, h, bpp, 0, 0, 0, 0 );
+    surface = sdl_surface_ptr(SDL_CreateRGBSurface ( 0, w, h, bpp, 0, 0, 0, 0 ));
     if ( surface == NULL ) {
         cout << __PRETTY_FUNCTION__ << " "
              << __LINE__ << " "
@@ -23,10 +22,10 @@ BasicDrawableObject::BasicDrawableObject ( int x, int y, int w, int h, int bpp )
 
 BasicDrawableObject::~BasicDrawableObject()
 {
-    SDL_FreeSurface ( surface );
+//    SDL_FreeSurface ( surface );
 }
 
-SDL_Surface* BasicDrawableObject::get_surface()
+sdl_surface_ptr BasicDrawableObject::get_surface()
 {
     return surface;
 }
