@@ -1,6 +1,7 @@
 #include "mdpc.hpp"
 #include "basic_drawable_object.hpp"
 #include "grid_unit.hpp"
+#include "grid.hpp"
 #include "moveable_object.hpp"
 
 #define GRID_UP 1
@@ -8,7 +9,8 @@
 #define GRID_LEFT 3
 #define GRID_RIGHT 4
 
-using namespace std;
+typedef boost::shared_ptr<GridUnit> grid_unit_ptr;
+typedef boost::shared_ptr<MoveableObject> moveable_object_ptr;
 
 // This function goes through the grids to find out which grid
 // is the player characeter currently located. Not sure if needed
@@ -102,6 +104,8 @@ int process_grid_map ( vector< vector<int> > &grid_map, int current_grid, int di
     return retval;
 }
 
+
+// This function initialize everything that doesn't need to return.
 bool init ()
 {
     if ( SDL_Init ( SDL_INIT_EVERYTHING ) < 0 ) {
@@ -147,15 +151,7 @@ int main ( int argc, char * argv[] )
         return 1;
     }
 
-    typedef boost::shared_ptr<GridUnit> grid_unit_ptr;
-    typedef boost::shared_ptr<MoveableObject> moveable_object_ptr;
-    bool quit = false;
     SDL_Surface * game_screen_ptr = NULL;
-    sdl_surface_ptr osd;
-    sdl_surface_ptr win_msg;
-    TTF_Font *osd_font = NULL;
-    SDL_Event event;
-
     game_screen_ptr = init_game_screen ();
     if ( game_screen_ptr == NULL ) {
         cout << __PRETTY_FUNCTION__ << " "
@@ -164,6 +160,27 @@ int main ( int argc, char * argv[] )
              << endl;
         return 1;
     }
+
+    // Base variables
+    bool quit = false;
+    SDL_Event event;
+    
+    // On screen display related variables.
+    sdl_surface_ptr osd;
+    sdl_surface_ptr win_msg;
+    TTF_Font *osd_font = NULL;
+    SDL_Color osd_text_colour = { 0, 255, 0 };
+    osd_font = TTF_OpenFont ( "/home/billy/Dropbox/devel/mdpc/fonts/ubuntu/Ubuntu-B.ttf", 14 );
+    if ( osd_font == NULL ) {
+        cout << __PRETTY_FUNCTION__ << " "
+             << __LINE__ << " "
+             << "ERROR: Unable to load font.\n"
+             << "ERROR: Unable to init game screen."
+             << endl;
+        return 1;
+    }
+
+    // Game related variables
 
 
     const int grid_size_w = game_screen_ptr->w / 30;
@@ -175,34 +192,37 @@ int main ( int argc, char * argv[] )
     const int end_point_size_w = ( grid_size_w / 3 );
     const int end_point_size_h = start_point_size_w;
 
-    SDL_Color osd_text_colour = { 0, 255, 0 };
-    osd_font = TTF_OpenFont ( "/home/billy/Dropbox/devel/mdpc/fonts/ubuntu/Ubuntu-B.ttf", 14 );
-    if ( osd_font == NULL ) {
-        printf ( "%s %d ERROR: Unable to load font.\n", __PRETTY_FUNCTION__, __LINE__ );
-        return 1;
-    }
 
     int grid_x = game_screen_ptr->w / grid_size_w;
     int grid_y = game_screen_ptr->h / grid_size_h;
     int grid_total = grid_x * grid_y;
     vector< vector<int> > grid_map ( grid_x, vector<int> ( grid_y ) );
 
+    // Populate the grid (gu_array) with GridUnits
     vector<grid_unit_ptr> gu_array;
+    // x horizotal, y vertical
     int x = 0, y = 0;
     for ( int i = 0; i < grid_total; i++ ) {
         grid_map[x][y] = i;
-        gu_array.push_back ( grid_unit_ptr ( new GridUnit ( x*grid_size_w, y*grid_size_h, grid_size_w, grid_size_h,
-                                             game_screen_ptr->format->BitsPerPixel ) ) );
+        gu_array.push_back ( grid_unit_ptr ( new GridUnit ( x*grid_size_w,
+                                                            y*grid_size_h,
+                                                            grid_size_w,
+                                                            grid_size_h,
+                                                            game_screen_ptr->format->BitsPerPixel)));
         x++;
+        // new line
         if ( x == grid_x ) {
             y++;
             x = 0;
         }
     }
 
-    moveable_object_ptr pc = moveable_object_ptr ( new MoveableObject ( 0, 0, character_size_w, character_size_h,
-                             game_screen_ptr->format->BitsPerPixel, ( rand() %
-                                     grid_total ) ) );
+    moveable_object_ptr pc = moveable_object_ptr ( new MoveableObject ( 0,
+                                                                        0, 
+                                                                        character_size_w, 
+                                                                        character_size_h,
+                                                                        game_screen_ptr->format->BitsPerPixel, 
+                                                                        ( rand()%grid_total ) ) );
     sdl_surface_ptr pc_surface = pc->get_surface();
     if ( pc_surface == NULL ) {
         printf ( "%s %d ERROR: Unable to load pc_surface.\n", __PRETTY_FUNCTION__, __LINE__ );

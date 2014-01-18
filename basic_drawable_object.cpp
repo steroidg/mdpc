@@ -1,7 +1,5 @@
 #include "basic_drawable_object.hpp"
 
-using namespace std;
-
 BasicDrawableObject::BasicDrawableObject ( int x, int y, int w, int h, int bpp )
 {
     this->x = x;

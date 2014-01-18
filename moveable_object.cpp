@@ -1,7 +1,5 @@
 #include "moveable_object.hpp"
 
-using namespace std;
-
 MoveableObject::MoveableObject ( int x, int y, int w, int h, int bpp, int grid ): BasicDrawableObject ( x, y, w, h, bpp
 )
 {

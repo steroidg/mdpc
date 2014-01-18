@@ -9,6 +9,7 @@
 #include <time.h>
 #include <tr1/memory>
 #include <boost/shared_ptr.hpp>
+using namespace std;
 
 typedef boost::shared_ptr<SDL_Surface> sdl_surface_ptr;
 #endif

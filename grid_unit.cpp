@@ -1,7 +1,5 @@
 #include "grid_unit.hpp"
 
-using namespace std;
-
 GridUnit::GridUnit ( int x, int y, int w, int h, int bpp ) : BasicDrawableObject ( x, y, w, h, bpp )
 {
     this->x = x;
