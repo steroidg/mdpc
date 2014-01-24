@@ -164,7 +164,7 @@ int main ( int argc, char * argv[] )
     // Base variables
     bool quit = false;
     SDL_Event event;
-    
+
     // On screen display related variables.
     sdl_surface_ptr osd;
     sdl_surface_ptr win_msg;
@@ -183,8 +183,8 @@ int main ( int argc, char * argv[] )
     // Game related variables
 
 
-    const int grid_size_w = game_screen_ptr->w / 30;
-    const int grid_size_h = grid_size_w;
+    const int grid_size_w = game_screen_ptr->w / 30;    // set a magic number of horizotal grids
+    const int grid_size_h = grid_size_w;                // make the grid square
     const int character_size_w = ( grid_size_w / 4 );
     const int character_size_h = character_size_w;
     const int start_point_size_w = ( grid_size_w / 2 );
@@ -198,6 +198,15 @@ int main ( int argc, char * argv[] )
     int grid_total = grid_x * grid_y;
     vector< vector<int> > grid_map ( grid_x, vector<int> ( grid_y ) );
 
+    Grid * game_grid = new Grid ( game_screen_ptr->w,
+                                  game_screen_ptr->h,
+                                  game_screen_ptr->format->BitsPerPixel,
+                                  grid_size_w,
+                                  grid_size_h,
+                                  grid_x,
+                                  grid_y,
+                                  grid_total );
+    free ( game_grid );
     // Populate the grid (gu_array) with GridUnits
     vector<grid_unit_ptr> gu_array;
     // x horizotal, y vertical
@@ -205,10 +214,10 @@ int main ( int argc, char * argv[] )
     for ( int i = 0; i < grid_total; i++ ) {
         grid_map[x][y] = i;
         gu_array.push_back ( grid_unit_ptr ( new GridUnit ( x*grid_size_w,
-                                                            y*grid_size_h,
-                                                            grid_size_w,
-                                                            grid_size_h,
-                                                            game_screen_ptr->format->BitsPerPixel)));
+                                             y*grid_size_h,
+                                             grid_size_w,
+                                             grid_size_h,
+                                             game_screen_ptr->format->BitsPerPixel ) ) );
         x++;
         // new line
         if ( x == grid_x ) {
@@ -218,11 +227,11 @@ int main ( int argc, char * argv[] )
     }
 
     moveable_object_ptr pc = moveable_object_ptr ( new MoveableObject ( 0,
-                                                                        0, 
-                                                                        character_size_w, 
-                                                                        character_size_h,
-                                                                        game_screen_ptr->format->BitsPerPixel, 
-                                                                        ( rand()%grid_total ) ) );
+                             0,
+                             character_size_w,
+                             character_size_h,
+                             game_screen_ptr->format->BitsPerPixel,
+                             ( rand() %grid_total ) ) );
     sdl_surface_ptr pc_surface = pc->get_surface();
     if ( pc_surface == NULL ) {
         printf ( "%s %d ERROR: Unable to load pc_surface.\n", __PRETTY_FUNCTION__, __LINE__ );
@@ -318,9 +327,9 @@ int main ( int argc, char * argv[] )
             pc_end = pc_end_tmp;
             pc_mirror_end = pc_mirror_end_tmp;
         }
-        cout << move_direction << endl;
-        cout << pc_end << endl;
-        cout << pc_mirror_end << endl;
+//        cout << move_direction << endl;
+//        cout << pc_end << endl;
+//        cout << pc_mirror_end << endl;
     }
 
     ep->set_grid ( pc_end );
