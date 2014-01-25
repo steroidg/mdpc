@@ -56,3 +56,13 @@ grid_total )
 Grid::~Grid()
 {
 }
+
+vector< grid_unit_ptr > Grid::get_grid_units()
+{
+    return gu_array;
+}
+
+vector< vector< int > > Grid::get_grid_map()
+{
+    return grid_map;
+}

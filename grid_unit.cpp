@@ -16,7 +16,7 @@ GridUnit::GridUnit ( int x, int y, int w, int h, int bpp ) : BasicDrawableObject
              << endl;
     }
     
-    this->render(0, 0, 150);
+    this->render(0, 150, 150);
 }
 
 
