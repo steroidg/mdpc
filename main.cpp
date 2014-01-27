@@ -59,39 +59,42 @@ SDL_Rect get_pc_location ( int grid_x,
 // and return the destination grid if movement is possible
 int process_grid_map ( vector< vector<int> > &grid_map, int current_grid, int direction )
 {
-    int grid_x = grid_map.size();
-    int grid_y = grid_map[0].size();
+    int grid_y = grid_map.size();
+    int grid_x = grid_map[0].size();
     int retval = 5;
+    
+    cout << "current_grid = " << current_grid << "\n" << endl;
+    cout << "direction = " << direction << "\n" << endl;
 
-    for ( int i=0; i<grid_y; i++ ) {
-        for ( int j=0; j<grid_x; j++ ) {
+    for ( int j=0; j<grid_y; j++ ) {
+        for ( int i=0; i<grid_x; i++ ) {
             if ( current_grid == grid_map[j][i] ) {
-                //cout << "grid_map[" <<j << "][" << i << "] = " << grid_map[j][i] << '\n';
+                cout << "grid_map[" <<j << "][" << i << "] = " << grid_map[j][i] << '\n';
                 switch ( direction ) {
                 case GRID_UP:
-                    if ( i > 0 ) {
-                        retval = grid_map[j][i-1];
-                    } else {
-                        retval = current_grid;
-                    }
-                    break;
-                case GRID_DOWN:
-                    if ( i < ( grid_y-1 ) ) {
-                        retval = grid_map[j][i+1];
-                    } else {
-                        retval = current_grid;
-                    }
-                    break;
-                case GRID_LEFT:
                     if ( j > 0 ) {
                         retval = grid_map[j-1][i];
                     } else {
                         retval = current_grid;
                     }
                     break;
-                case GRID_RIGHT:
-                    if ( j < ( grid_x-1 ) ) {
+                case GRID_DOWN:
+                    if ( j < ( grid_y-1 ) ) {
                         retval = grid_map[j+1][i];
+                    } else {
+                        retval = current_grid;
+                    }
+                    break;
+                case GRID_LEFT:
+                    if ( i > 0 ) {
+                        retval = grid_map[j][i-1];
+                    } else {
+                        retval = current_grid;
+                    }
+                    break;
+                case GRID_RIGHT:
+                    if ( i < ( grid_x-1 ) ) {
+                        retval = grid_map[j][i+1];
                     } else {
                         retval = current_grid;
                     }

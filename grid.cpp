@@ -38,18 +38,18 @@ grid_total )
             x = 0;
         }
     }
-    x = 0; y = 0;
-    while (y < grid_y) {
-        while (x < grid_x) {
-            cout << "gu_array[grid_map[" << y << "][" << x << "]]->get_x() =" << gu_array[grid_map[y][x]]->get_x() <<
-"\n" << endl;
-            cout << "gu_array[grid_map[" << y << "][" << x << "]]->get_y() =" << gu_array[grid_map[y][x]]->get_y() <<
-"\n" << endl;
-            x++;
-        }
-        x = 0; 
-        y++;
-    }
+//    x = 0; y = 0;
+//    while (y < grid_y) {
+//        while (x < grid_x) {
+//            cout << "gu_array[grid_map[" << y << "][" << x << "]]->get_x() =" << gu_array[grid_map[y][x]]->get_x() <<
+//"\n" << endl;
+//            cout << "gu_array[grid_map[" << y << "][" << x << "]]->get_y() =" << gu_array[grid_map[y][x]]->get_y() <<
+//"\n" << endl;
+//            x++;
+//        }
+//        x = 0; 
+//        y++;
+//    }
 }
 
 
