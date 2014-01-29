@@ -5,13 +5,11 @@
 class BasicDrawableObject
 {
 public:
-    BasicDrawableObject ( int x, int y, int w, int h, int bpp );
+    BasicDrawableObject ( vector<int> position, vector<int> dimension, int bpp );
     ~BasicDrawableObject ();
     sdl_surface_ptr get_surface ();
-    int get_x ();
-    int get_y ();
-    int get_w ();
-    int get_h ();
+    vector<int> get_position ();
+    vector<int> get_dimension ();
     void set_x ( int x );
     void set_y ( int y );
     void set_w ( int w );
@@ -19,10 +17,9 @@ public:
 
 protected:
     sdl_surface_ptr surface;
-    int x;
-    int y;
-    int w;
-    int h;
+    //TODO: maybe position and dimension should be struct or objects rather than vectors
+    vector<int> position;
+    vector<int> dimension;
     int bpp;
 };
 

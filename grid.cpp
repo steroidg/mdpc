@@ -1,16 +1,17 @@
 #include "grid.hpp"
 
-Grid::Grid ( int screen_x, int screen_y, int bpp, int grid_size_w, int grid_size_h, int grid_x, int grid_y, int
-grid_total )
+Grid::Grid ( int screen_x, int screen_y, int bpp )
 {
+    // Grid related variables
+    grid_x = 32; // magic number for grid columns (x axis)
+    grid_y = 18; // magic number for grid rows (y axis)
+    grid_total = grid_x * grid_y; // total number of grid units
+    
     this->screen_x = screen_x;
     this->screen_y = screen_y;
     this->bpp = bpp;
-    this->grid_size_w= grid_size_w;
-    this->grid_size_h = grid_size_h;
-    this->grid_x = grid_x;
-    this->grid_y = grid_y;
-    this->grid_total = grid_total;
+    this->grid_size_w = screen_x / grid_x;
+    this->grid_size_h = screen_y / grid_y;
     
     cout << "screen_x = " << screen_x << "\n"
          << "screen_y = " << screen_y << "\n"
@@ -24,10 +25,14 @@ grid_total )
     vector<int> row;
     for ( int i = 0; i < grid_total; i++ ) {
         row.push_back(i);
-        gu_array.push_back ( grid_unit_ptr ( new GridUnit ( x*grid_size_w,
-                                                            y*grid_size_h,
-                                                            grid_size_w,
-                                                            grid_size_h,
+        vector<int> position;
+        position.push_back(x*grid_size_w);
+        position.push_back(y*grid_size_h);
+        vector<int> dimension;
+        dimension.push_back(grid_size_w);
+        dimension.push_back(grid_size_h);
+        gu_array.push_back ( grid_unit_ptr ( new GridUnit ( position,
+                                                            dimension,
                                                             bpp )));
 //        // new line
         x++;
@@ -65,4 +70,19 @@ vector< grid_unit_ptr > Grid::get_grid_units()
 vector< vector< int > > Grid::get_grid_map()
 {
     return grid_map;
+}
+
+int Grid::get_grid_width ()
+{
+    return grid_size_w; 
+}
+
+int Grid::get_grid_height ()
+{
+    return grid_size_h; 
+}
+
+int Grid::get_grid_total()
+{
+    return grid_total;
 }

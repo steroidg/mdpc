@@ -1,14 +1,13 @@
 #include "basic_drawable_object.hpp"
 
-BasicDrawableObject::BasicDrawableObject ( int x, int y, int w, int h, int bpp )
+BasicDrawableObject::BasicDrawableObject ( vector<int> position, vector<int> dimension, int bpp )
 {
-    this->x = x;
-    this->y = y;
-    this->w = w;
-    this->h = h;
+    this->position = position;
+    this->dimension = dimension;
     this->bpp = bpp;
 
-    surface = sdl_surface_ptr(SDL_CreateRGBSurface ( 0, w, h, bpp, 0, 0, 0, 0 ));
+    // TODO: dimension need to have width and height defined
+    surface = sdl_surface_ptr(SDL_CreateRGBSurface ( 0, dimension[0], dimension[1], bpp, 0, 0, 0, 0 ));
     if ( surface == NULL ) {
         cout << __PRETTY_FUNCTION__ << " "
              << __LINE__ << " "
@@ -27,42 +26,32 @@ sdl_surface_ptr BasicDrawableObject::get_surface()
     return surface;
 }
 
-int BasicDrawableObject::get_x()
+vector< int > BasicDrawableObject::get_position()
 {
-    return x;
+    return position;
 }
 
-int BasicDrawableObject::get_y()
+vector< int > BasicDrawableObject::get_dimension()
 {
-    return y;
-}
-
-int BasicDrawableObject::get_w()
-{
-    return w;
-}
-
-int BasicDrawableObject::get_h()
-{
-    return h;
+    return dimension;
 }
 
 void BasicDrawableObject::set_x ( int x )
 {
-    this->x = x;
+    this->position[0] = x;
 }
 
 void BasicDrawableObject::set_y ( int y )
 {
-    this->y = y;
+    this->position[1] = y;
 }
 
 void BasicDrawableObject::set_w ( int w )
 {
-    this->w = w;
+    this->dimension[0] = w;
 }
 
 void BasicDrawableObject::set_h ( int h )
 {
-    this->h = h;
+    this->dimension[1] = h;
 }
