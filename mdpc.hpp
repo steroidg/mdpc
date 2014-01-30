@@ -11,8 +11,6 @@
 #include <boost/shared_ptr.hpp>
 using namespace std;
 
-typedef boost::shared_ptr<SDL_Surface> sdl_surface_ptr;
-
 struct Position {
     int x;
     int y;
@@ -23,4 +21,7 @@ struct Dimension {
     int h;
 };
 
+typedef boost::shared_ptr<SDL_Surface> sdl_surface_ptr;
+typedef boost::shared_ptr<Position> position_ptr;
+typedef boost::shared_ptr<Dimension> dimension_ptr;
 #endif

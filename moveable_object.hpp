@@ -6,7 +6,7 @@
 class MoveableObject: public BasicDrawableObject
 {
 public:
-    MoveableObject ( Position p, Dimension d, int bpp, int grid );
+    MoveableObject ( position_ptr p, dimension_ptr d, int bpp, int grid );
     ~MoveableObject();
     int get_current_grid();
     void set_grid ( int grid );

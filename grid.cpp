@@ -25,13 +25,13 @@ Grid::Grid ( int screen_x, int screen_y, int bpp )
     vector<int> row;
     for ( int i = 0; i < grid_total; i++ ) {
         row.push_back(i);
-        Position p;
-        p.x = x * grid_size_w;
-        p.y = y * grid_size_h;
+        position_ptr p (new Position);
+        p->x = x * grid_size_w;
+        p->y = y * grid_size_h;
         
-        Dimension d;
-        d.w = grid_size_w;
-        d.h = grid_size_h;
+        dimension_ptr d (new Dimension);
+        d->w = grid_size_w;
+        d->h = grid_size_h;
         gu_array.push_back ( grid_unit_ptr ( new GridUnit ( p, d, bpp )));
 //        // new line
         x++;
