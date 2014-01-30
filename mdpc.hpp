@@ -12,4 +12,15 @@
 using namespace std;
 
 typedef boost::shared_ptr<SDL_Surface> sdl_surface_ptr;
+
+struct Position {
+    int x;
+    int y;
+};
+
+struct Dimension {
+    int w;
+    int h;
+};
+
 #endif

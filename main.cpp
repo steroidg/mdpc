@@ -28,10 +28,10 @@ int player_location ( int x,
 
     for ( int i = 0; i < grid_total; i++ ) {
         player_location = i;
-        if ( pc_centre_x >= gu_array[i]->get_position()[0] &&
-                pc_centre_x < ( gu_array[i]->get_position()[0] + gu_array[i]->get_dimension()[0] ) &&
-                pc_centre_y >= gu_array[i]->get_position()[1] &&
-                pc_centre_y < ( gu_array[i]->get_position()[1] + gu_array[i]->get_dimension()[1] ) ) {
+        if ( pc_centre_x >= gu_array[i]->get_position().x &&
+                pc_centre_x < ( gu_array[i]->get_position().x + gu_array[i]->get_dimension().w ) &&
+                pc_centre_y >= gu_array[i]->get_position().y &&
+                pc_centre_y < ( gu_array[i]->get_position().y + gu_array[i]->get_dimension().h ) ) {
             break;
         }
     }
@@ -193,26 +193,26 @@ int main ( int argc, char * argv[] )
 
 
     // Game related variables
-    vector<int> starting_position;
-    starting_position.push_back(0);
-    starting_position.push_back(0);
+    Position starting_position;
+    starting_position.x = 0;
+    starting_position.y = 0;
     
-    vector<int> character_dimension;
-    character_dimension.push_back(game_grid->get_grid_width() / 4 );
-    character_dimension.push_back(game_grid->get_grid_width() / 4 );
+    Dimension character_dimension;
+    character_dimension.w = game_grid->get_grid_width() / 4;
+    character_dimension.h = game_grid->get_grid_width() / 4;
     
-    vector<int> character_mirror_dimension;
-    character_mirror_dimension.push_back(game_grid->get_grid_width() / 6 );
-    character_mirror_dimension.push_back(game_grid->get_grid_width() / 6 );
+    Dimension character_mirror_dimension;
+    character_mirror_dimension.w = game_grid->get_grid_width() / 6;
+    character_mirror_dimension.h = game_grid->get_grid_width() / 6;
     
     
-    vector<int> start_point_dimension;
-    start_point_dimension.push_back(game_grid->get_grid_width() / 2 );
-    start_point_dimension.push_back(game_grid->get_grid_width() / 2 );
+    Dimension start_point_dimension;
+    start_point_dimension.w = game_grid->get_grid_width() / 2;
+    start_point_dimension.h = game_grid->get_grid_width() / 2;
     
-    vector<int> end_point_dimension;
-    end_point_dimension.push_back(game_grid->get_grid_width() / 3);
-    end_point_dimension.push_back(game_grid->get_grid_width() / 3);
+    Dimension end_point_dimension;
+    end_point_dimension.w = game_grid->get_grid_width() / 3;
+    end_point_dimension.h = game_grid->get_grid_width() / 3;
 
     moveable_object_ptr pc = moveable_object_ptr ( new MoveableObject (
                              starting_position,
@@ -399,10 +399,10 @@ int main ( int argc, char * argv[] )
 
         // Populate
         for ( int i = 0; i < game_grid->get_grid_total(); i++ ) {
-            SDL_Rect gu_location = { gu_array[i]->get_position()[0],
-                                     gu_array[i]->get_position()[1],
-                                     gu_array[i]->get_dimension()[0],
-                                     gu_array[i]->get_dimension()[1]
+            SDL_Rect gu_location = { gu_array[i]->get_position().x,
+                                     gu_array[i]->get_position().y,
+                                     gu_array[i]->get_dimension().w,
+                                     gu_array[i]->get_dimension().h
                                    };
 //            gu_array[i]->get_position()[1];
 //            gu_array[i]->get_dimension()[0];
@@ -418,57 +418,57 @@ int main ( int argc, char * argv[] )
 
 //        SDL_Rect pc_location = { pc->get_x(), pc->get_y(), pc->get_w(), pc->get_h() };
         SDL_Rect pc_location = get_pc_location (
-                               gu_array[pc->get_current_grid()]->get_position()[0],
-                               gu_array[pc->get_current_grid()]->get_position()[1],
-                               gu_array[pc->get_current_grid()]->get_dimension()[0],
-                               gu_array[pc->get_current_grid()]->get_dimension()[1],
-                               pc->get_dimension()[0],
-                               pc->get_dimension()[1] );
+                               gu_array[pc->get_current_grid()]->get_position().x,
+                               gu_array[pc->get_current_grid()]->get_position().y,
+                               gu_array[pc->get_current_grid()]->get_dimension().w,
+                               gu_array[pc->get_current_grid()]->get_dimension().h,
+                               pc->get_dimension().w,
+                               pc->get_dimension().h );
         SDL_BlitSurface ( & ( *pc_surface ), NULL, game_screen_ptr, &pc_location );
 
         SDL_Rect pc_mirron_location = get_pc_location (
-                                      gu_array[pc_mirror->get_current_grid()]->get_position()[0],
-                                      gu_array[pc_mirror->get_current_grid()]->get_position()[1],
-                                      gu_array[pc_mirror->get_current_grid()]->get_dimension()[0],
-                                      gu_array[pc_mirror->get_current_grid()]->get_position()[1],
-                                      pc_mirror->get_dimension()[0],
-                                      pc_mirror->get_dimension()[1] );
+                                      gu_array[pc_mirror->get_current_grid()]->get_position().x,
+                                      gu_array[pc_mirror->get_current_grid()]->get_position().y,
+                                      gu_array[pc_mirror->get_current_grid()]->get_dimension().w,
+                                      gu_array[pc_mirror->get_current_grid()]->get_dimension().h,
+                                      pc_mirror->get_dimension().w,
+                                      pc_mirror->get_dimension().h );
         SDL_BlitSurface ( & ( *pc_mirror_surface ), NULL, game_screen_ptr, &pc_mirron_location );
 
         SDL_Rect sp_location = get_pc_location (
-                               gu_array[sp->get_current_grid()]->get_position()[0],
-                               gu_array[sp->get_current_grid()]->get_position()[1],
-                               gu_array[sp->get_current_grid()]->get_dimension()[0],
-                               gu_array[sp->get_current_grid()]->get_dimension()[1],
-                               sp->get_dimension()[0],
-                               sp->get_dimension()[1] );
+                               gu_array[sp->get_current_grid()]->get_position().x,
+                               gu_array[sp->get_current_grid()]->get_position().y,
+                               gu_array[sp->get_current_grid()]->get_dimension().w,
+                               gu_array[sp->get_current_grid()]->get_dimension().h,
+                               sp->get_dimension().w,
+                               sp->get_dimension().h );
         SDL_BlitSurface ( & ( *sp_surface ), NULL, game_screen_ptr, &sp_location );
 
         SDL_Rect ep_location = get_pc_location (
-                               gu_array[ep->get_current_grid()]->get_position()[0],
-                               gu_array[ep->get_current_grid()]->get_position()[1],
-                               gu_array[ep->get_current_grid()]->get_dimension()[0],
-                               gu_array[ep->get_current_grid()]->get_dimension()[1],
-                               ep->get_dimension()[0],
-                               ep->get_dimension()[1] );
+                               gu_array[ep->get_current_grid()]->get_position().x,
+                               gu_array[ep->get_current_grid()]->get_position().y,
+                               gu_array[ep->get_current_grid()]->get_dimension().w,
+                               gu_array[ep->get_current_grid()]->get_dimension().h,
+                               ep->get_dimension().w,
+                               ep->get_dimension().h );
         //SDL_BlitSurface ( ep_surface, NULL, screen, &ep_location );
 
         SDL_Rect pc_mirror_sp_location = get_pc_location (
-                                         gu_array[pc_mirror_sp->get_current_grid()]->get_position()[0],
-                                         gu_array[pc_mirror_sp->get_current_grid()]->get_position()[1],
-                                         gu_array[pc_mirror_sp->get_current_grid()]->get_dimension()[0],
-                                         gu_array[pc_mirror_sp->get_current_grid()]->get_dimension()[1],
-                                         pc_mirror_sp->get_dimension()[0],
-                                         pc_mirror_sp->get_dimension()[1] );
+                                         gu_array[pc_mirror_sp->get_current_grid()]->get_position().x,
+                                         gu_array[pc_mirror_sp->get_current_grid()]->get_position().y,
+                                         gu_array[pc_mirror_sp->get_current_grid()]->get_dimension().w,
+                                         gu_array[pc_mirror_sp->get_current_grid()]->get_dimension().h,
+                                         pc_mirror_sp->get_dimension().w,
+                                         pc_mirror_sp->get_dimension().h );
         SDL_BlitSurface ( & ( *pc_mirror_sp_surface ), NULL, game_screen_ptr, &pc_mirror_sp_location );
 
         SDL_Rect pc_mirror_ep_location = get_pc_location (
-                                         gu_array[pc_mirror_ep->get_current_grid()]->get_position()[0],
-                                         gu_array[pc_mirror_ep->get_current_grid()]->get_position()[1],
-                                         gu_array[pc_mirror_ep->get_current_grid()]->get_dimension()[0],
-                                         gu_array[pc_mirror_ep->get_current_grid()]->get_dimension()[1],
-                                         pc_mirror_ep->get_dimension()[0],
-                                         pc_mirror_ep->get_dimension()[1]);
+                                         gu_array[pc_mirror_ep->get_current_grid()]->get_position().x,
+                                         gu_array[pc_mirror_ep->get_current_grid()]->get_position().y,
+                                         gu_array[pc_mirror_ep->get_current_grid()]->get_dimension().w,
+                                         gu_array[pc_mirror_ep->get_current_grid()]->get_dimension().h,
+                                         pc_mirror_ep->get_dimension().w,
+                                         pc_mirror_ep->get_dimension().h);
         SDL_BlitSurface ( & ( *pc_mirror_ep_surface ), NULL, game_screen_ptr, &pc_mirror_ep_location );
 
 

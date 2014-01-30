@@ -1,14 +1,13 @@
 #include "moveable_object.hpp"
 
-MoveableObject::MoveableObject ( vector<int> position, vector<int> dimension, int bpp, int grid ):
-BasicDrawableObject ( position, dimension, bpp )
+MoveableObject::MoveableObject ( Position p, Dimension d, int bpp, int grid ): BasicDrawableObject ( p, d, bpp )
 {
-    this->position = position;
-    this->dimension = dimension;
+    this->position = p;
+    this->dimension = d;
     this->bpp = bpp;
     this->current_grid = grid;
 
-    surface = sdl_surface_ptr(SDL_CreateRGBSurface ( 0, dimension[0], dimension[1], bpp, 0, 0, 0, 0 ));
+    surface = sdl_surface_ptr(SDL_CreateRGBSurface ( 0, dimension.w, dimension.h, bpp, 0, 0, 0, 0 ));
     if ( surface == NULL ) {
         cout << __PRETTY_FUNCTION__ << " "
              << __LINE__ << " "

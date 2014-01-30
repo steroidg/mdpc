@@ -6,7 +6,7 @@
 class GridUnit: public BasicDrawableObject
 {
 public:
-    GridUnit ( vector<int> position, vector<int> dimension, int bpp );
+    GridUnit ( Position p, Dimension d, int bpp );
     ~GridUnit ();
     void set_colour ( int r, int g, int b );
 private:

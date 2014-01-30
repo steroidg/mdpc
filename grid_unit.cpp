@@ -1,13 +1,12 @@
 #include "grid_unit.hpp"
 
-GridUnit::GridUnit ( vector<int> position, vector<int> dimension, int bpp ) : BasicDrawableObject ( position, dimension,
-bpp )
+GridUnit::GridUnit ( Position p, Dimension d, int bpp ) : BasicDrawableObject ( p, d, bpp )
 {
-    this->position = position;
-    this->dimension = dimension;
+    this->position = p;
+    this->dimension = d;
     this->bpp = bpp;
 
-    surface = sdl_surface_ptr(SDL_CreateRGBSurface ( 0, dimension[0], dimension[1], bpp, 0, 0, 0, 0 ));
+    surface = sdl_surface_ptr(SDL_CreateRGBSurface ( 0, dimension.w, dimension.h, bpp, 0, 0, 0, 0 ));
     if ( surface == NULL ) {
         cout << __PRETTY_FUNCTION__ << " "
              << __LINE__ << " "
