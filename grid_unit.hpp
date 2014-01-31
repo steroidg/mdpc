@@ -1,25 +1,15 @@
-#include <SDL.h>
-#include <iostream>
+#ifndef GRID_UNIT_H
+#define GRID_UNIT_H
+#include "mdpc.hpp"
+#include "basic_drawable_object.hpp"
 
-class GridUnit {
-	public:
-		GridUnit(int x, int y, int w, int h);
-		~GridUnit();
-		SDL_Surface * get_surface();
-		int get_x();
-		int get_y();
-		int get_w();
-		int get_h();
-		void set_x(int x);
-		void set_y(int y);
-		void set_w(int w);
-		void set_h(int h);
-		void set_colour (int r, int g, int b);
-	private:
-		SDL_Surface *surface;
-		int x;
-		int y;
-		int w;
-		int h;
-		void render(int r, int g, int b);
+class GridUnit: public BasicDrawableObject
+{
+public:
+    GridUnit ( Position p, Dimension d, int bpp );
+    ~GridUnit ();
+    void set_colour ( int r, int g, int b );
+private:
+    void render ( int r, int g, int b );
 };
+#endif

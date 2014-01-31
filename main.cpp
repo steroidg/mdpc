@@ -1,21 +1,17 @@
-#include <SDL.h>
-#include <SDL_ttf.h>
-#include <iostream>
-#include <sstream>
-#include <vector>
-#include <time.h>
-#include "player_character.hpp"
-#include "start_point.hpp"
-#include "end_point.hpp"
+#include "mdpc.hpp"
+#include "basic_drawable_object.hpp"
 #include "grid_unit.hpp"
+#include "grid.hpp"
+#include "moveable_object.hpp"
 
 #define GRID_UP 1
 #define GRID_DOWN 2
 #define GRID_LEFT 3
 #define GRID_RIGHT 4
 
-using namespace std;
-
+typedef boost::shared_ptr<GridUnit> grid_unit_ptr;
+typedef boost::shared_ptr<MoveableObject> moveable_object_ptr;
+typedef boost::shared_ptr<Grid> grid_ptr;
 
 // This function goes through the grids to find out which grid
 // is the player characeter currently located. Not sure if needed
@@ -32,10 +28,10 @@ int player_location ( int x,
 
     for ( int i = 0; i < grid_total; i++ ) {
         player_location = i;
-        if ( pc_centre_x >= gu_array[i]->get_x() &&
-                pc_centre_x < ( gu_array[i]->get_x() + gu_array[i]->get_w() ) &&
-                pc_centre_y >= gu_array[i]->get_y() &&
-                pc_centre_y < ( gu_array[i]->get_y() + gu_array[i]->get_h() ) ) {
+        if ( pc_centre_x >= gu_array[i]->get_position().x &&
+                pc_centre_x < ( gu_array[i]->get_position().x + gu_array[i]->get_dimension().w ) &&
+                pc_centre_y >= gu_array[i]->get_position().y &&
+                pc_centre_y < ( gu_array[i]->get_position().y + gu_array[i]->get_dimension().h ) ) {
             break;
         }
     }
@@ -63,39 +59,42 @@ SDL_Rect get_pc_location ( int grid_x,
 // and return the destination grid if movement is possible
 int process_grid_map ( vector< vector<int> > &grid_map, int current_grid, int direction )
 {
-    int grid_x = grid_map.size();
-    int grid_y = grid_map[0].size();
+    int grid_y = grid_map.size();
+    int grid_x = grid_map[0].size();
     int retval = 5;
 
-    for ( int i=0; i<grid_y; i++ ) {
-        for ( int j=0; j<grid_x; j++ ) {
+    cout << "current_grid = " << current_grid << "\n" << endl;
+    cout << "direction = " << direction << "\n" << endl;
+
+    for ( int j=0; j<grid_y; j++ ) {
+        for ( int i=0; i<grid_x; i++ ) {
             if ( current_grid == grid_map[j][i] ) {
-                //cout << "grid_map[" <<j << "][" << i << "] = " << grid_map[j][i] << '\n';
+                cout << "grid_map[" <<j << "][" << i << "] = " << grid_map[j][i] << '\n';
                 switch ( direction ) {
                 case GRID_UP:
-                    if ( i > 0 ) {
-                        retval = grid_map[j][i-1];
-                    } else {
-                        retval = current_grid;
-                    }
-                    break;
-                case GRID_DOWN:
-                    if ( i < ( grid_y-1 ) ) {
-                        retval = grid_map[j][i+1];
-                    } else {
-                        retval = current_grid;
-                    }
-                    break;
-                case GRID_LEFT:
                     if ( j > 0 ) {
                         retval = grid_map[j-1][i];
                     } else {
                         retval = current_grid;
                     }
                     break;
-                case GRID_RIGHT:
-                    if ( j < ( grid_x-1 ) ) {
+                case GRID_DOWN:
+                    if ( j < ( grid_y-1 ) ) {
                         retval = grid_map[j+1][i];
+                    } else {
+                        retval = current_grid;
+                    }
+                    break;
+                case GRID_LEFT:
+                    if ( i > 0 ) {
+                        retval = grid_map[j][i-1];
+                    } else {
+                        retval = current_grid;
+                    }
+                    break;
+                case GRID_RIGHT:
+                    if ( i < ( grid_x-1 ) ) {
+                        retval = grid_map[j][i+1];
                     } else {
                         retval = current_grid;
                     }
@@ -110,126 +109,200 @@ int process_grid_map ( vector< vector<int> > &grid_map, int current_grid, int di
 }
 
 
-// Main function duh!
-int main ( int argc, char *argv[] )
+// This function initialize everything that doesn't need to return.
+bool init ()
 {
-    /* init variables */
-    const int SCREEN_WIDTH = 1000;
-    const int SCREEN_HEIGHT = 800;
-    const int SCREEN_BPP = 32;
-    const int GRID_SIZE_W = 50;
-    const int GRID_SIZE_H = 50;
-    const int PC_SIZE_W = 40;
-    const int PC_SIZE_H = 40;
-    const int SP_SIZE_W = 40;
-    const int SP_SIZE_H = 40;
-    bool quit = false;
-    SDL_Event event;
-    SDL_Surface *screen = NULL;
-    SDL_Surface *osd = NULL;
-    SDL_Surface *win_msg = NULL;
-    TTF_Font *osd_font = NULL;
+    if ( SDL_Init ( SDL_INIT_EVERYTHING ) < 0 ) {
+        cout << __PRETTY_FUNCTION__ << " "
+             << __LINE__ << " "
+             << "ERROR: failed to init SDL."
+             << endl;
+        return false;
+    };
+
+    if ( TTF_Init() < 0 ) {
+        cout << __PRETTY_FUNCTION__ << " "
+             << __LINE__ << " "
+             << "ERROR: failed to init TTF."
+             << endl;
+        return false;
+    };
+
+    return true;
+}
 
 
-    /* init */
-    SDL_Init ( SDL_INIT_EVERYTHING );
-    screen = SDL_SetVideoMode ( SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, SDL_HWSURFACE );
-    if ( screen == NULL ) {
-        printf ( "%s %d ERROR: Unable to load screen.\n", __PRETTY_FUNCTION__, __LINE__ );
+SDL_Surface * init_game_screen ()
+{
+    const SDL_VideoInfo* vinfo = SDL_GetVideoInfo();
+    const int screen_width = ( vinfo->current_w - 10 );
+    const int screen_height = ( vinfo->current_h - 10 );
+    const int screen_bpp = 32;
+
+    SDL_Surface * screen = SDL_SetVideoMode ( screen_width, screen_height,
+                           screen_bpp, SDL_HWSURFACE );
+    return screen;
+}
+
+// Main function duh!
+int main ( int argc, char * argv[] )
+{
+    if ( ! init() ) {
+        cout << __PRETTY_FUNCTION__ << " "
+             << __LINE__ << " "
+             << "ERROR: failed to init."
+             << endl;
         return 1;
     }
 
-    TTF_Init();
+    SDL_Surface * game_screen_ptr = NULL;
+    game_screen_ptr = init_game_screen ();
+    if ( game_screen_ptr == NULL ) {
+        cout << __PRETTY_FUNCTION__ << " "
+             << __LINE__ << " "
+             << "ERROR: Unable to init game screen."
+             << endl;
+        return 1;
+    }
+
+    // Base variables
+    bool quit = false;
+    SDL_Event event;
+
+    // On screen display related variables.
+    sdl_surface_ptr osd;
+    sdl_surface_ptr win_msg;
+    TTF_Font *osd_font = NULL;
     SDL_Color osd_text_colour = { 0, 255, 0 };
     osd_font = TTF_OpenFont ( "/home/billy/Dropbox/devel/mdpc/fonts/ubuntu/Ubuntu-B.ttf", 14 );
     if ( osd_font == NULL ) {
-        printf ( "%s %d ERROR: Unable to load font.\n", __PRETTY_FUNCTION__, __LINE__ );
+        cout << __PRETTY_FUNCTION__ << " "
+             << __LINE__ << " "
+             << "ERROR: Unable to load font.\n"
+             << "ERROR: Unable to init game screen."
+             << endl;
         return 1;
     }
 
-    int grid_x = SCREEN_WIDTH/GRID_SIZE_W;
-    int grid_y = SCREEN_HEIGHT/GRID_SIZE_H;
-    int grid_total = grid_x * grid_y;
-    vector< vector<int> > grid_map ( grid_x, vector<int> ( grid_y ) );
+    grid_ptr game_grid = grid_ptr ( new Grid ( game_screen_ptr->w,
+                                    game_screen_ptr->h,
+                                    game_screen_ptr->format->BitsPerPixel ) );
 
-    GridUnit ** gu_array = new GridUnit*[grid_total];
-    int x = 0, y = 0;
-    for ( int i = 0; i < grid_total; i++ ) {
-        grid_map[x][y] = i;
-        gu_array[i] = new GridUnit ( x*GRID_SIZE_W, y*GRID_SIZE_H, GRID_SIZE_W, GRID_SIZE_H );
-        x++;
-        if ( x == grid_x ) {
-            y++;
-            x = 0;
-        }
-    }
+    vector< grid_unit_ptr > gu_array = game_grid->get_grid_units();
+    vector< vector<int> > grid_map = game_grid->get_grid_map ();
 
-    PlayerCharacter * pc = new PlayerCharacter ( 0, 0, PC_SIZE_W, PC_SIZE_H, (rand() % grid_total) );
-    SDL_Surface *pc_surface = pc->get_surface();
+
+    // Game related variables
+    Position starting_position;
+    starting_position.x = 0;
+    starting_position.y = 0;
+    
+    Dimension character_dimension;
+    character_dimension.w = game_grid->get_grid_width() / 4;
+    character_dimension.h = game_grid->get_grid_width() / 4;
+    
+    Dimension character_mirror_dimension;
+    character_mirror_dimension.w = game_grid->get_grid_width() / 6;
+    character_mirror_dimension.h = game_grid->get_grid_width() / 6;
+    
+    
+    Dimension start_point_dimension;
+    start_point_dimension.w = game_grid->get_grid_width() / 2;
+    start_point_dimension.h = game_grid->get_grid_width() / 2;
+    
+    Dimension end_point_dimension;
+    end_point_dimension.w = game_grid->get_grid_width() / 3;
+    end_point_dimension.h = game_grid->get_grid_width() / 3;
+
+    moveable_object_ptr pc = moveable_object_ptr ( new MoveableObject (
+                             starting_position,
+                             character_dimension,
+                             game_screen_ptr->format->BitsPerPixel,
+                             ( rand() % game_grid->get_grid_total() ) ) );
+    sdl_surface_ptr pc_surface = pc->get_surface();
     if ( pc_surface == NULL ) {
         printf ( "%s %d ERROR: Unable to load pc_surface.\n", __PRETTY_FUNCTION__, __LINE__ );
         return 1;
     }
 
-    PlayerCharacter * pc_mirror = new PlayerCharacter ( 0, 0, PC_SIZE_W - 10, PC_SIZE_H - 10, 28 );
-    SDL_Surface *pc_mirror_surface = pc_mirror->get_surface();
+    moveable_object_ptr pc_mirror = moveable_object_ptr ( new MoveableObject (
+                                    starting_position,
+                                    character_mirror_dimension,
+                                    game_screen_ptr->format->BitsPerPixel, ( rand() %
+                                            game_grid->get_grid_total() ) ) );
+    sdl_surface_ptr pc_mirror_surface = pc_mirror->get_surface();
     if ( pc_mirror_surface == NULL ) {
         printf ( "%s %d ERROR: Unable to load pc_mirror_surface.\n", __PRETTY_FUNCTION__, __LINE__ );
         return 1;
     }
 
-    StartPoint * sp = new StartPoint ( 0, 0, SP_SIZE_W, SP_SIZE_H, 45 );
-    SDL_Surface * sp_surface = sp->get_surface();
+    moveable_object_ptr sp = moveable_object_ptr ( new MoveableObject (
+                             starting_position,
+                             start_point_dimension,
+                             game_screen_ptr->format->BitsPerPixel, 45 ) );
+    sdl_surface_ptr sp_surface = sp->get_surface();
     if ( sp_surface == NULL ) {
         printf ( "%s %d ERROR: Unable to load sp_surface.\n", __PRETTY_FUNCTION__, __LINE__ );
         return 1;
     }
-    
-    EndPoint * ep = new EndPoint ( 0, 0, SP_SIZE_W, SP_SIZE_H, 99 );
-    SDL_Surface * ep_surface = ep->get_surface();
+
+    moveable_object_ptr ep = moveable_object_ptr ( new MoveableObject (
+                             starting_position,
+                             end_point_dimension,
+                             game_screen_ptr->format->BitsPerPixel, 99 ) );
+    sdl_surface_ptr ep_surface = ep->get_surface();
     if ( ep_surface == NULL ) {
         printf ( "%s %d ERROR: Unable to load ep_surface.\n", __PRETTY_FUNCTION__, __LINE__ );
         return 1;
     }
 
-    StartPoint * pc_mirror_sp = new StartPoint ( 0, 0, SP_SIZE_W, SP_SIZE_H, 108 );
-    SDL_Surface * pc_mirror_sp_surface = pc_mirror_sp->get_surface();
+    moveable_object_ptr pc_mirror_sp = moveable_object_ptr ( new MoveableObject (
+                                       starting_position,
+                                       start_point_dimension,
+                                       game_screen_ptr->format->BitsPerPixel,
+                                       108 ) );
+    sdl_surface_ptr pc_mirror_sp_surface = pc_mirror_sp->get_surface();
     if ( pc_mirror_sp_surface == NULL ) {
         printf ( "%s %d ERROR: Unable to load pc_mirror_sp_surface.\n", __PRETTY_FUNCTION__, __LINE__ );
         return 1;
     }
-    
-    EndPoint * pc_mirror_ep = new EndPoint ( 0, 0, SP_SIZE_W, SP_SIZE_H, 120 );
-    SDL_Surface * pc_mirror_ep_surface = pc_mirror_ep->get_surface();
+
+    moveable_object_ptr pc_mirror_ep = moveable_object_ptr ( new MoveableObject (
+                                       starting_position,
+                                       end_point_dimension,
+                                       game_screen_ptr->format->BitsPerPixel,
+                                       120 ) );
+    sdl_surface_ptr pc_mirror_ep_surface = pc_mirror_ep->get_surface();
     if ( pc_mirror_ep_surface == NULL ) {
         printf ( "%s %d ERROR: Unable to load pc_mirror_ep_surface.\n", __PRETTY_FUNCTION__, __LINE__ );
         return 1;
     }
-    
-    srand (time(0));
-    int pc_start = rand() % grid_total;
+
+    srand ( time ( 0 ) );
+    int pc_start = rand() % game_grid->get_grid_total();
     int pc_mirror_start = pc_start;
     while ( pc_mirror_start == pc_start ) {
-        pc_mirror_start = rand() %grid_total;
-    cout << "pc_start = " << pc_start << endl;
-    cout << "pc_mirror_start = " << pc_mirror_start << endl;
+        pc_mirror_start = rand() % game_grid->get_grid_total();
+        cout << "pc_start = " << pc_start << endl;
+        cout << "pc_mirror_start = " << pc_mirror_start << endl;
     }
-    
-    pc->set_grid(pc_start);
-    pc_mirror->set_grid(pc_mirror_start);
-    sp->set_grid(pc_start);
-    pc_mirror_sp->set_grid(pc_mirror_start);
-    
+
+    pc->set_grid ( pc_start );
+    pc_mirror->set_grid ( pc_mirror_start );
+    sp->set_grid ( pc_start );
+    pc_mirror_sp->set_grid ( pc_mirror_start );
+
     int pc_end = pc_start;
     int pc_mirror_end = pc_mirror_start;
-    int nmoves = rand() % 100 + 50;
+    int nmoves = rand() % 300 + 200;
     cout << "nmoves = " << nmoves << endl;
-    
-    for (int i = 0; i < nmoves; i++) {
+
+    for ( int i = 0; i < nmoves; i++ ) {
+        // Generate random direction, which is #defined as from 1-4
         int move_direction = rand() %4 + 1;
         int pc_end_tmp = pc_end;
         int pc_mirror_end_tmp = pc_mirror_end;
-        
+
         if ( move_direction == GRID_UP ) {
             pc_end_tmp = ( process_grid_map ( grid_map, pc_end, GRID_UP ) );
             pc_mirror_end_tmp = ( process_grid_map ( grid_map, pc_mirror_end, GRID_DOWN ) );
@@ -243,21 +316,21 @@ int main ( int argc, char *argv[] )
             pc_end_tmp = ( process_grid_map ( grid_map, pc_end, GRID_RIGHT ) );
             pc_mirror_end_tmp = ( process_grid_map ( grid_map, pc_mirror_end, GRID_LEFT ) );
         }
-        
-        if (( pc_end != pc_end_tmp) && (pc_mirror_end != pc_mirror_end_tmp)) {
+
+        if ( ( pc_end != pc_end_tmp ) && ( pc_mirror_end != pc_mirror_end_tmp ) ) {
             pc_end = pc_end_tmp;
             pc_mirror_end = pc_mirror_end_tmp;
         }
-        cout << move_direction << endl;
-        cout << pc_end << endl;
-        cout << pc_mirror_end << endl;
+//        cout << move_direction << endl;
+//        cout << pc_end << endl;
+//        cout << pc_mirror_end << endl;
     }
-    
-    ep->set_grid(pc_end);
-    pc_mirror_ep->set_grid(pc_mirror_end);
-    
-    
-    win_msg = TTF_RenderText_Solid ( osd_font, "You a winrar!", osd_text_colour );
+
+    ep->set_grid ( pc_end );
+    pc_mirror_ep->set_grid ( pc_mirror_end );
+
+
+    win_msg = sdl_surface_ptr ( TTF_RenderText_Solid ( osd_font, "You a winrar!", osd_text_colour ) );
     SDL_Rect win_msg_location = {100, 100, 300, 200};
 
     /* game loop */
@@ -299,17 +372,17 @@ int main ( int argc, char *argv[] )
             }
         }
 
-            if (( pc_grid != pc_tmp_grid) && (pc_mirror_grid != pc_mirror_tmp_grid)) {
-                pc->set_grid(pc_tmp_grid);
-                pc_mirror->set_grid(pc_mirror_tmp_grid);
-            }
+        if ( ( pc_grid != pc_tmp_grid ) && ( pc_mirror_grid != pc_mirror_tmp_grid ) ) {
+            pc->set_grid ( pc_tmp_grid );
+            pc_mirror->set_grid ( pc_mirror_tmp_grid );
+        }
         // Display on screen data
         stringstream osd_str;
         osd_str << "count" << counter;
         std::string boo = osd_str.str();
         const char * whoa = boo.c_str();
 
-        osd = TTF_RenderText_Solid ( osd_font, whoa, osd_text_colour );
+        osd = sdl_surface_ptr ( TTF_RenderText_Solid ( osd_font, whoa, osd_text_colour ) );
         if ( osd == NULL ) {
             printf ( "%s %d ERROR: Unable to load osd.\n", __PRETTY_FUNCTION__, __LINE__ );
             return 1;
@@ -318,88 +391,94 @@ int main ( int argc, char *argv[] )
 
 
         // Fills background colour
-        Uint32 bg_colour = SDL_MapRGB ( screen->format, 0, 255, 255 );
-        if ( SDL_FillRect ( screen, &screen->clip_rect, bg_colour ) == -1 ) {
+        Uint32 bg_colour = SDL_MapRGB ( game_screen_ptr->format, 0, 255, 255 );
+        if ( SDL_FillRect ( game_screen_ptr, &game_screen_ptr->clip_rect, bg_colour ) == -1 ) {
             printf ( "%s %d ERROR: failed to fill background colour.\n", __PRETTY_FUNCTION__, __LINE__ );
             return 1;
         }
 
         // Populate
-        for ( int i = 0; i < grid_total; i++ ) {
-            SDL_Rect gu_location = { gu_array[i]->get_x(),
-                                     gu_array[i]->get_y(),
-                                     gu_array[i]->get_w(),
-                                     gu_array[i]->get_h()
+        for ( int i = 0; i < game_grid->get_grid_total(); i++ ) {
+            SDL_Rect gu_location = { gu_array[i]->get_position().x,
+                                     gu_array[i]->get_position().y,
+                                     gu_array[i]->get_dimension().w,
+                                     gu_array[i]->get_dimension().h
                                    };
-            gu_array[i]->get_y();
-            gu_array[i]->get_w();
-            gu_array[i]->get_h();
+//            gu_array[i]->get_position()[1];
+//            gu_array[i]->get_dimension()[0];
+//            gu_array[i]->get_dimension()[1];
 
-            SDL_Surface * gu_surface = gu_array[i]->get_surface();
+            sdl_surface_ptr gu_surface = gu_array[i]->get_surface();
             if ( gu_surface == NULL ) {
                 printf ( "%s %d ERROR: failed to get gu_surface .\n", __PRETTY_FUNCTION__, __LINE__ );
                 return 1;
             }
-            SDL_BlitSurface ( gu_surface, NULL, screen, &gu_location );
+            SDL_BlitSurface ( & ( *gu_surface ), NULL, game_screen_ptr, &gu_location );
         }
 
 //        SDL_Rect pc_location = { pc->get_x(), pc->get_y(), pc->get_w(), pc->get_h() };
-        SDL_Rect pc_location = get_pc_location ( gu_array[pc->get_current_grid()]->get_x(),
-                               gu_array[pc->get_current_grid()]->get_y(),
-                               gu_array[pc->get_current_grid()]->get_w(),
-                               gu_array[pc->get_current_grid()]->get_h(),
-                               pc->get_w(),
-                               pc->get_h() );
-        SDL_BlitSurface ( pc_surface, NULL, screen, &pc_location );
+        SDL_Rect pc_location = get_pc_location (
+                               gu_array[pc->get_current_grid()]->get_position().x,
+                               gu_array[pc->get_current_grid()]->get_position().y,
+                               gu_array[pc->get_current_grid()]->get_dimension().w,
+                               gu_array[pc->get_current_grid()]->get_dimension().h,
+                               pc->get_dimension().w,
+                               pc->get_dimension().h );
+        SDL_BlitSurface ( & ( *pc_surface ), NULL, game_screen_ptr, &pc_location );
 
-        SDL_Rect pc_mirron_location = get_pc_location ( gu_array[pc_mirror->get_current_grid()]->get_x(),
-                                      gu_array[pc_mirror->get_current_grid()]->get_y(),
-                                      gu_array[pc_mirror->get_current_grid()]->get_w(),
-                                      gu_array[pc_mirror->get_current_grid()]->get_h(),
-                                      pc_mirror->get_w(),
-                                      pc_mirror->get_h() );
-        SDL_BlitSurface ( pc_mirror_surface, NULL, screen, &pc_mirron_location );
+        SDL_Rect pc_mirron_location = get_pc_location (
+                                      gu_array[pc_mirror->get_current_grid()]->get_position().x,
+                                      gu_array[pc_mirror->get_current_grid()]->get_position().y,
+                                      gu_array[pc_mirror->get_current_grid()]->get_dimension().w,
+                                      gu_array[pc_mirror->get_current_grid()]->get_dimension().h,
+                                      pc_mirror->get_dimension().w,
+                                      pc_mirror->get_dimension().h );
+        SDL_BlitSurface ( & ( *pc_mirror_surface ), NULL, game_screen_ptr, &pc_mirron_location );
 
-        SDL_Rect sp_location = get_pc_location ( gu_array[sp->get_current_grid()]->get_x(),
-                               gu_array[sp->get_current_grid()]->get_y(),
-                               gu_array[sp->get_current_grid()]->get_w(),
-                               gu_array[sp->get_current_grid()]->get_h(),
-                               sp->get_w(),
-                               sp->get_h() );
-        SDL_BlitSurface ( sp_surface, NULL, screen, &sp_location );
-        
-        SDL_Rect ep_location = get_pc_location ( gu_array[ep->get_current_grid()]->get_x(),
-                               gu_array[ep->get_current_grid()]->get_y(),
-                               gu_array[ep->get_current_grid()]->get_w(),
-                               gu_array[ep->get_current_grid()]->get_h(),
-                               ep->get_w(),
-                               ep->get_h() );
-        SDL_BlitSurface ( ep_surface, NULL, screen, &ep_location );
-        
-        SDL_Rect pc_mirror_sp_location = get_pc_location ( gu_array[pc_mirror_sp->get_current_grid()]->get_x(),
-                               gu_array[pc_mirror_sp->get_current_grid()]->get_y(),
-                               gu_array[pc_mirror_sp->get_current_grid()]->get_w(),
-                               gu_array[pc_mirror_sp->get_current_grid()]->get_h(),
-                               pc_mirror_sp->get_w(),
-                               pc_mirror_sp->get_h() );
-        SDL_BlitSurface ( pc_mirror_sp_surface, NULL, screen, &pc_mirror_sp_location );
-        
-        SDL_Rect pc_mirror_ep_location = get_pc_location ( gu_array[pc_mirror_ep->get_current_grid()]->get_x(),
-                               gu_array[pc_mirror_ep->get_current_grid()]->get_y(),
-                               gu_array[pc_mirror_ep->get_current_grid()]->get_w(),
-                               gu_array[pc_mirror_ep->get_current_grid()]->get_h(),
-                               pc_mirror_ep->get_w(),
-                               pc_mirror_ep->get_h() );
-        SDL_BlitSurface ( pc_mirror_ep_surface, NULL, screen, &pc_mirror_ep_location );
+        SDL_Rect sp_location = get_pc_location (
+                               gu_array[sp->get_current_grid()]->get_position().x,
+                               gu_array[sp->get_current_grid()]->get_position().y,
+                               gu_array[sp->get_current_grid()]->get_dimension().w,
+                               gu_array[sp->get_current_grid()]->get_dimension().h,
+                               sp->get_dimension().w,
+                               sp->get_dimension().h );
+        SDL_BlitSurface ( & ( *sp_surface ), NULL, game_screen_ptr, &sp_location );
+
+        SDL_Rect ep_location = get_pc_location (
+                               gu_array[ep->get_current_grid()]->get_position().x,
+                               gu_array[ep->get_current_grid()]->get_position().y,
+                               gu_array[ep->get_current_grid()]->get_dimension().w,
+                               gu_array[ep->get_current_grid()]->get_dimension().h,
+                               ep->get_dimension().w,
+                               ep->get_dimension().h );
+        //SDL_BlitSurface ( ep_surface, NULL, screen, &ep_location );
+
+        SDL_Rect pc_mirror_sp_location = get_pc_location (
+                                         gu_array[pc_mirror_sp->get_current_grid()]->get_position().x,
+                                         gu_array[pc_mirror_sp->get_current_grid()]->get_position().y,
+                                         gu_array[pc_mirror_sp->get_current_grid()]->get_dimension().w,
+                                         gu_array[pc_mirror_sp->get_current_grid()]->get_dimension().h,
+                                         pc_mirror_sp->get_dimension().w,
+                                         pc_mirror_sp->get_dimension().h );
+        SDL_BlitSurface ( & ( *pc_mirror_sp_surface ), NULL, game_screen_ptr, &pc_mirror_sp_location );
+
+        SDL_Rect pc_mirror_ep_location = get_pc_location (
+                                         gu_array[pc_mirror_ep->get_current_grid()]->get_position().x,
+                                         gu_array[pc_mirror_ep->get_current_grid()]->get_position().y,
+                                         gu_array[pc_mirror_ep->get_current_grid()]->get_dimension().w,
+                                         gu_array[pc_mirror_ep->get_current_grid()]->get_dimension().h,
+                                         pc_mirror_ep->get_dimension().w,
+                                         pc_mirror_ep->get_dimension().h);
+        SDL_BlitSurface ( & ( *pc_mirror_ep_surface ), NULL, game_screen_ptr, &pc_mirror_ep_location );
 
 
         if ( pc_mirror->get_current_grid() == pc_mirror_ep->get_current_grid() ) {
-            SDL_BlitSurface ( win_msg, NULL, screen, &win_msg_location );
+            SDL_BlitSurface ( & ( *win_msg ), NULL, game_screen_ptr, &win_msg_location );
         }
-        
-        SDL_BlitSurface ( osd, NULL, screen, &osd_location );
 
-        if ( SDL_Flip ( screen ) == -1 ) {
+        SDL_BlitSurface ( & ( *osd ), NULL, game_screen_ptr, &osd_location );
+
+        if ( SDL_Flip ( game_screen_ptr ) == -1 ) {
             printf ( "%s %d ERROR: failed to flip.\n", __PRETTY_FUNCTION__, __LINE__ );
             return 1;
         }
@@ -408,17 +487,8 @@ int main ( int argc, char *argv[] )
         SDL_Delay ( 10 );
     }
 
-    /* clean up */
-    for ( int i = 0; i < grid_total; i++ ) {
-        delete gu_array[i];
-    }
-    delete gu_array;
-    delete pc;
-    delete pc_mirror;
-    delete sp;
-    delete ep;
     TTF_CloseFont ( osd_font );
-    SDL_FreeSurface ( screen );
+    SDL_FreeSurface ( game_screen_ptr );
     SDL_Quit();
 
     return 0;
