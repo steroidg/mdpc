@@ -197,6 +197,7 @@ int main ( int argc, char * argv[] )
     starting_position.x = 0;
     starting_position.y = 0;
     
+    
     Dimension character_dimension;
     character_dimension.w = game_grid->get_grid_width() / 4;
     character_dimension.h = game_grid->get_grid_width() / 4;
