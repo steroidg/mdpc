@@ -22,6 +22,4 @@ struct Dimension {
 };
 
 typedef boost::shared_ptr<SDL_Surface> sdl_surface_ptr;
-typedef boost::shared_ptr<Position> position_ptr;
-typedef boost::shared_ptr<Dimension> dimension_ptr;
 #endif

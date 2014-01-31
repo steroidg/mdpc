@@ -5,11 +5,11 @@
 class BasicDrawableObject
 {
 public:
-    BasicDrawableObject ( position_ptr p, dimension_ptr d, int bpp );
+    BasicDrawableObject ( Position p, Dimension d, int bpp );
     ~BasicDrawableObject ();
     sdl_surface_ptr get_surface ();
-    position_ptr get_position ();
-    dimension_ptr get_dimension ();
+    Position get_position ();
+    Dimension get_dimension ();
     void set_x ( int x );
     void set_y ( int y );
     void set_w ( int w );
@@ -17,8 +17,8 @@ public:
 
 protected:
     sdl_surface_ptr surface;
-    position_ptr position;
-    dimension_ptr dimension;
+    Position position;
+    Dimension dimension;
     int bpp;
 };
 
