@@ -1,3 +1,6 @@
 *.kdev4
 *~
 build/
+fonts/
+doc/
+foo/

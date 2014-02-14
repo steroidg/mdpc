@@ -1,6 +1,7 @@
 #ifndef MDPC_H
 #define MDPC_H
 
+// This header file should include everything that's shared across all objects
 #include <SDL.h>
 #include <SDL_ttf.h>
 #include <iostream>
@@ -8,18 +9,23 @@
 #include <vector>
 #include <time.h>
 #include <tr1/memory>
-#include <boost/shared_ptr.hpp>
+//#include <boost/shared_ptr.hpp>
 using namespace std;
 
-struct Position {
-    int x;
-    int y;
-};
-
-struct Dimension {
+struct Dimension2D {
     int w;
     int h;
 };
 
-typedef boost::shared_ptr<SDL_Surface> sdl_surface_ptr;
+struct Position2D {
+    int x;
+    int y;
+};
+
+struct RGB_colour {
+    int r;
+    int g;
+    int b;
+};
+
 #endif

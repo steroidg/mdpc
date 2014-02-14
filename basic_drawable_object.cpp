@@ -1,12 +1,12 @@
 #include "basic_drawable_object.hpp"
 
-BasicDrawableObject::BasicDrawableObject ( Position p, Dimension d, int bpp )
+BasicDrawableObject::BasicDrawableObject ( Position2D p, Dimension2D d, int bpp )
 {
     this->position = p;
     this->dimension = d;
     this->bpp = bpp;
 
-    surface = sdl_surface_ptr(SDL_CreateRGBSurface ( 0, dimension.w, dimension.h, bpp, 0, 0, 0, 0 ));
+    surface = SDL_CreateRGBSurface ( 0, dimension.w, dimension.h, bpp, 0, 0, 0, 0 );
     if ( surface == NULL ) {
         cout << __PRETTY_FUNCTION__ << " "
              << __LINE__ << " "
@@ -17,20 +17,20 @@ BasicDrawableObject::BasicDrawableObject ( Position p, Dimension d, int bpp )
 
 BasicDrawableObject::~BasicDrawableObject()
 {
-//    SDL_FreeSurface ( surface );
+    SDL_FreeSurface ( surface );
 }
 
-sdl_surface_ptr BasicDrawableObject::get_surface()
+SDL_Surface * BasicDrawableObject::get_surface()
 {
     return surface;
 }
 
-Position BasicDrawableObject::get_position()
+Position2D BasicDrawableObject::get_position()
 {
     return position;
 }
 
-Dimension BasicDrawableObject::get_dimension()
+Dimension2D BasicDrawableObject::get_dimension()
 {
     return dimension;
 }

@@ -5,20 +5,27 @@
 class BasicDrawableObject
 {
 public:
-    BasicDrawableObject ( Position p, Dimension d, int bpp );
+    /**
+     * Constructor
+     * \param p Position of the object
+     * \param d Dimension of the object
+     * \param bpp bits per pixel for the SDL_Surface
+     */
+    BasicDrawableObject ( Position2D p, Dimension2D d, int bpp );
+    /** Destructor */
     ~BasicDrawableObject ();
-    sdl_surface_ptr get_surface ();
-    Position get_position ();
-    Dimension get_dimension ();
+    SDL_Surface * get_surface ();
+    Position2D get_position ();
+    Dimension2D get_dimension ();
     void set_x ( int x );
     void set_y ( int y );
     void set_w ( int w );
     void set_h ( int h );
 
 protected:
-    sdl_surface_ptr surface;
-    Position position;
-    Dimension dimension;
+    SDL_Surface * surface;
+    Position2D position;
+    Dimension2D dimension;
     int bpp;
 };
 
