@@ -44,8 +44,9 @@ Grid::Grid ( int screen_x, int screen_y, int bpp )
 
 Grid::~Grid()
 {
-    for ( int i = 0; i < gu_array.size(); i++ ) {
-        delete gu_array[i];
+    while (!gu_array.empty()) {
+        delete gu_array.back();
+        gu_array.pop_back();
     }
 }
 

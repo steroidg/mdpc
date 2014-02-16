@@ -23,5 +23,7 @@ class GridUnit: public BasicDrawableObject
     private:
         /** Colour of the grid */
         RGB_colour * colour;
+        /** SDL surface pointe of the grid
+        SDL_Surface * surface;
 };
 #endif
